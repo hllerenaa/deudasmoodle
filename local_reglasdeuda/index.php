@@ -21,16 +21,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_reglasdeuda\local\pestanas;
 use local_reglasdeuda\local\reglas;
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->libdir . '/adminlib.php');
 
 $accion = optional_param('accion', '', PARAM_ALPHA);
 $id = optional_param('id', 0, PARAM_INT);
 
-admin_externalpage_setup('local_reglasdeuda_reglas');
 $url = new moodle_url('/local/reglasdeuda/index.php');
+pestanas::configurar_pagina($url, get_string('pluginname', 'local_reglasdeuda'));
 
 if ($accion && $id && ($regla = reglas::obtener($id))) {
     if ($accion === 'activar' || $accion === 'desactivar') {
@@ -53,7 +53,7 @@ if ($accion && $id && ($regla = reglas::obtener($id))) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('reglas', 'local_reglasdeuda'));
+echo pestanas::html('reglas');
 
 if (!get_config('local_reglasdeuda', 'habilitado')) {
     echo $OUTPUT->notification(get_string('plugindeshabilitado', 'local_reglasdeuda'), 'warning');
@@ -111,10 +111,5 @@ if (empty($tabla->data)) {
     echo html_writer::table($tabla);
 }
 
-echo html_writer::div(
-    $OUTPUT->single_button(new moodle_url('/local/reglasdeuda/editar.php'), get_string('nuevaregla', 'local_reglasdeuda'),
-        'get') . ' ' .
-    $OUTPUT->single_button(new moodle_url('/local/reglasdeuda/contrato.php'), get_string('contrato', 'local_reglasdeuda'), 'get'),
-    'd-flex gap-2');
 
 echo $OUTPUT->footer();

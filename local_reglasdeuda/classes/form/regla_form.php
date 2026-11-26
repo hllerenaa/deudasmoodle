@@ -18,6 +18,7 @@ namespace local_reglasdeuda\form;
 
 use local_reglasdeuda\local\cliente_api;
 use local_reglasdeuda\local\mensaje;
+use local_reglasdeuda\local\parametros;
 use local_reglasdeuda\local\plantilla;
 use local_reglasdeuda\local\reglas;
 
@@ -67,6 +68,25 @@ class regla_form extends \moodleform {
         $f->addElement('text', 'url', get_string('url', $c), ['size' => 70]);
         $f->setType('url', PARAM_RAW_TRIMMED);
         $f->addRule('url', null, 'required', null, 'client');
+        $f->addElement('select', 'metodo', get_string('metodo', $c), cliente_api::metodos());
+
+        // Parametros enviados: nombre <- campo de Moodle (o valor fijo), una fila por parametro.
+        $f->addElement('static', 'parametros_titulo', \html_writer::tag('strong', get_string('parametros', $c)));
+        $fila = [
+            $f->createElement('text', 'param_nombre', get_string('param_nombre', $c),
+                ['size' => 18, 'placeholder' => get_string('param_nombre', $c)]),
+            $f->createElement('select', 'param_campo', get_string('param_campo', $c),
+                ['' => get_string('choosedots')] + parametros::campos_disponibles()),
+            $f->createElement('text', 'param_valor', get_string('param_valor', $c),
+                ['size' => 16, 'placeholder' => get_string('param_valor_ph', $c)]),
+        ];
+        $grupo = $f->createElement('group', 'param_grupo', get_string('parametro', $c), $fila, ' ← ', false);
+        $this->repeat_elements([$grupo], max(1, (int)($this->_customdata['numparametros'] ?? 1)), [
+            'param_nombre' => ['type' => PARAM_RAW_TRIMMED],
+            'param_valor' => ['type' => PARAM_RAW_TRIMMED],
+            'param_grupo' => ['helpbutton' => ['parametro', $c]],
+        ], 'param_repeticiones', 'param_agregar', 1, get_string('agregarparametro', $c), true);
+
         $f->addElement('select', 'autenticacion', get_string('autenticacion', $c), [
             'ninguna' => get_string('autenticacion_ninguna', $c),
             'bearer' => get_string('autenticacion_bearer', $c),
@@ -80,17 +100,6 @@ class regla_form extends \moodleform {
         $f->hideIf('token', 'autenticacion', 'eq', 'ninguna');
         $f->addElement('text', 'timeout', get_string('timeout', $c), ['size' => 4]);
         $f->setType('timeout', PARAM_INT);
-        $f->addElement('select', 'identificador', get_string('identificador', $c), [
-            'idnumber' => get_string('idnumber'),
-            'username' => get_string('username'),
-            'email' => get_string('email'),
-        ]);
-        $f->addHelpButton('identificador', 'identificador', $c);
-        $f->addElement('textarea', 'plantilla', get_string('plantilla', $c),
-            ['rows' => 12, 'cols' => 70, 'class' => 'text-monospace font-monospace']);
-        $f->setType('plantilla', PARAM_RAW);
-        $f->addRule('plantilla', null, 'required', null, 'client');
-        $f->addHelpButton('plantilla', 'plantilla', $c);
 
         // Respuesta.
         $f->addElement('header', 'h_respuesta', get_string('respuesta', $c));
@@ -190,8 +199,23 @@ class regla_form extends \moodleform {
         if ($data['timeout'] < 1 || $data['timeout'] > 30) {
             $errores['timeout'] = get_string('error_timeout', $c);
         }
-        if (!is_array(json_decode($data['plantilla'], true))) {
-            $errores['plantilla'] = get_string('error_plantilla', $c) . ' (' . json_last_error_msg() . ')';
+        $vistos = [];
+        foreach (self::parametros_enviados($data) as $i => $p) {
+            $clave = "param_grupo[$i]";
+            if (!parametros::nombre_valido($p['nombre'])) {
+                $errores[$clave] = get_string('error_param_nombre', $c);
+            } else if (isset($vistos[$p['nombre']])) {
+                $errores[$clave] = get_string('error_param_repetido', $c);
+            } else if ($p['campo'] === '') {
+                $errores[$clave] = get_string('required');
+            }
+            $vistos[$p['nombre']] = true;
+        }
+        $conmoodle = array_filter(self::parametros_enviados($data), function($p) {
+            return $p['campo'] !== '' && $p['campo'] !== parametros::FIJO;
+        });
+        if (!$conmoodle) {
+            $errores['param_grupo[0]'] = get_string('error_sinparametros', $c);
         }
         if (trim($data['respuestaejemplo']) !== '' && !is_array(json_decode($data['respuestaejemplo'], true))) {
             $errores['respuestaejemplo'] = get_string('error_json', $c);
@@ -224,6 +248,30 @@ class regla_form extends \moodleform {
             $errores['token'] = get_string('error_token', $c);
         }
         return $errores;
+    }
+
+    /**
+     * Filas de parametros con nombre (las filas vacias se ignoran), conservando el indice de la fila.
+     *
+     * @param array|\stdClass $data datos del formulario
+     * @return array indice => ['nombre', 'campo', 'valor']
+     */
+    public static function parametros_enviados($data): array {
+        $data = (array)$data;
+        $filas = [];
+        foreach ((array)($data['param_nombre'] ?? []) as $i => $nombre) {
+            $nombre = trim((string)$nombre);
+            if ($nombre === '') {
+                continue;
+            }
+            $campo = (string)($data['param_campo'][$i] ?? '');
+            $filas[$i] = [
+                'nombre' => $nombre,
+                'campo' => $campo,
+                'valor' => $campo === parametros::FIJO ? trim((string)($data['param_valor'][$i] ?? '')) : '',
+            ];
+        }
+        return $filas;
     }
 
     /**

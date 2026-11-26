@@ -15,8 +15,8 @@
         <FIELD NAME="cabeceranombre" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="token" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timeout" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="5" SEQUENCE="false"/>
-        <FIELD NAME="identificador" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="idnumber" SEQUENCE="false" COMMENT="username, idnumber o email"/>
-        <FIELD NAME="plantilla" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON enviado a la API"/>
+        <FIELD NAME="metodo" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="post_json" SEQUENCE="false" COMMENT="get, post_json o post_form"/>
+        <FIELD NAME="parametros" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON: [{nombre, campo, valor}]"/>
         <FIELD NAME="rutaresultado" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="resultado" SEQUENCE="false"/>
         <FIELD NAME="rutadatos" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="datos" SEQUENCE="false"/>
         <FIELD NAME="rutamensaje" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="mensaje" SEQUENCE="false"/>

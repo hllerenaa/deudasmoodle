@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Ajustes y paginas de administracion.
+ * Una sola entrada en la administracion; todo lo demas va en pestanas (ver classes/local/pestanas.php).
  *
  * @package    local_reglasdeuda
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -23,24 +23,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$ADMIN->add('localplugins', new admin_category('local_reglasdeuda_categoria',
-    new lang_string('pluginname', 'local_reglasdeuda')));
-
-if ($hassiteconfig) {
-    $settings = new admin_settingpage('local_reglasdeuda', new lang_string('ajustesgenerales', 'local_reglasdeuda'));
-    $settings->add(new admin_setting_configcheckbox('local_reglasdeuda/habilitado',
-        new lang_string('habilitado', 'local_reglasdeuda'),
-        new lang_string('habilitado_desc', 'local_reglasdeuda'), 1));
-    $settings->add(new admin_setting_configcheckbox('local_reglasdeuda/hostsinternos',
-        new lang_string('hostsinternos', 'local_reglasdeuda'),
-        new lang_string('hostsinternos_desc', 'local_reglasdeuda'), 0));
-    $ADMIN->add('local_reglasdeuda_categoria', $settings);
-}
-
-$ADMIN->add('local_reglasdeuda_categoria', new admin_externalpage('local_reglasdeuda_reglas',
-    new lang_string('reglas', 'local_reglasdeuda'),
+$ADMIN->add('localplugins', new admin_externalpage('local_reglasdeuda_reglas',
+    new lang_string('pluginname', 'local_reglasdeuda'),
     new moodle_url('/local/reglasdeuda/index.php'), 'local/reglasdeuda:gestionar'));
-
-$ADMIN->add('local_reglasdeuda_categoria', new admin_externalpage('local_reglasdeuda_contrato',
-    new lang_string('contrato', 'local_reglasdeuda'),
-    new moodle_url('/local/reglasdeuda/contrato.php'), 'local/reglasdeuda:gestionar'));

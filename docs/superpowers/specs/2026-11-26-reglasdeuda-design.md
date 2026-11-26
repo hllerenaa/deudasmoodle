@@ -124,3 +124,11 @@ concretas por ID (`actividades`) y/o filtros por tipo, categoría y curso
 (`globalactivo`, `globalmodulos`, `globalcategorias`, `globalcursos`). Los
 docentes ya no configuran la restricción por actividad; la actividad sigue
 visible y el usuario ve el mensaje al entrar.
+
+## Cambio 2026-11-26: parámetros en lugar de plantilla JSON
+
+Cada regla define método (GET, POST JSON, POST formulario) y una tabla de
+parámetros nombre ← campo de Moodle (estándar, de perfil o valor fijo). Se
+quitaron `plantilla` e `identificador` (db/upgrade.php migra el identificador a
+un parámetro). La administración pasó a una sola página con pestañas (Reglas,
+Nueva regla, Contrato, Ajustes) y tras instalar/actualizar se redirige allí.

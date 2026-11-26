@@ -24,17 +24,15 @@
 use local_reglasdeuda\form\probar_form;
 use local_reglasdeuda\local\evaluador;
 use local_reglasdeuda\local\mensaje;
-use local_reglasdeuda\local\plantilla;
+use local_reglasdeuda\local\pestanas;
 use local_reglasdeuda\local\reglas;
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->libdir . '/adminlib.php');
 
 $id = required_param('id', PARAM_INT);
 
-admin_externalpage_setup('local_reglasdeuda_reglas');
 $url = new moodle_url('/local/reglasdeuda/probar.php', ['id' => $id]);
-$PAGE->set_url($url);
+pestanas::configurar_pagina($url, get_string('probar', 'local_reglasdeuda'));
 
 $regla = reglas::obtener($id);
 if (!$regla) {
@@ -57,9 +55,9 @@ if (optional_param('usarejemplo', 0, PARAM_BOOL) && confirm_sesskey()) {
 $form = new probar_form($url);
 $form->set_data(['id' => $id]);
 
-$PAGE->set_title(get_string('probarregla', $c, format_string($regla->nombre)));
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('probarregla', $c, format_string($regla->nombre)));
+echo pestanas::html('reglas');
+echo $OUTPUT->heading(get_string('probarregla', $c, format_string($regla->nombre)), 3);
 echo html_writer::div(
     html_writer::link(new moodle_url('/local/reglasdeuda/editar.php', ['id' => $id]), get_string('edit')) . ' · ' .
     html_writer::link(new moodle_url('/local/reglasdeuda/index.php'), get_string('reglas', $c)), 'mb-3');
@@ -87,11 +85,9 @@ if ($datos = $form->get_data()) {
         echo $OUTPUT->notification(get_string('probar_exento', $c), 'warning');
     }
 
-    $auth = $regla->autenticacion === 'bearer' ? 'Authorization: Bearer ****' :
-        ($regla->autenticacion === 'cabecera' ? s($regla->cabeceranombre) . ': ****' : '');
-    echo $bloque(get_string('peticion', $c),
-        html_writer::div('POST ' . s($regla->url) . ($auth ? '<br>' . $auth : ''), 'small mb-1') .
-        $codigo($ev['peticion']));
+    // La peticion ya viene descrita (metodo, URL, cabeceras con el token oculto y cuerpo).
+    echo $bloque(get_string('peticion', $c), html_writer::tag('pre', s($ev['peticion']),
+        ['class' => 'bg-light p-2 border rounded small']));
 
     $estado = 'HTTP ' . $ev['http'] . ' · ' . $ev['duracionms'] . ' ms';
     echo $bloque(get_string('respuesta', $c), html_writer::div($estado, 'small mb-1') .

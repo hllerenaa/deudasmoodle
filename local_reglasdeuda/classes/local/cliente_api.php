@@ -22,22 +22,52 @@ global $CFG;
 require_once($CFG->libdir . '/filelib.php');
 
 /**
- * Llamada HTTP a la API de una regla.
+ * Llamada HTTP a la API de una regla: GET con parametros en la URL, POST JSON o POST formulario.
  *
  * @package    local_reglasdeuda
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cliente_api {
 
+    const GET = 'get';
+    const POST_JSON = 'post_json';
+    const POST_FORM = 'post_form';
+
     /**
-     * Envia el cuerpo JSON por POST.
+     * Como quedaria la peticion (para Probar y el Contrato).
      *
      * @param \stdClass $regla
-     * @param string $cuerpo JSON
+     * @param array $valores nombre => valor
+     * @return array ['metodo' => 'GET'|'POST', 'url' => string, 'cuerpo' => string, 'tipo' => content-type|'']
+     */
+    public static function peticion(\stdClass $regla, array $valores): array {
+        switch ($regla->metodo) {
+            case self::GET:
+                $separador = strpos($regla->url, '?') === false ? '?' : '&';
+                $url = $valores ? $regla->url . $separador . http_build_query($valores, '', '&', PHP_QUERY_RFC3986) : $regla->url;
+                return ['metodo' => 'GET', 'url' => $url, 'cuerpo' => '', 'tipo' => ''];
+            case self::POST_FORM:
+                return ['metodo' => 'POST', 'url' => $regla->url, 'tipo' => 'application/x-www-form-urlencoded',
+                    'cuerpo' => http_build_query($valores, '', '&', PHP_QUERY_RFC3986)];
+            default:
+                return ['metodo' => 'POST', 'url' => $regla->url, 'tipo' => 'application/json',
+                    'cuerpo' => json_encode((object)$valores, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES |
+                        JSON_INVALID_UTF8_SUBSTITUTE)];
+        }
+    }
+
+    /**
+     * Ejecuta la peticion.
+     *
+     * @param \stdClass $regla
+     * @param array $peticion de peticion()
      * @return array ['http' => int, 'cuerpo' => string, 'error' => string, 'duracionms' => int]
      */
-    public static function enviar(\stdClass $regla, string $cuerpo): array {
-        $cabeceras = ['Content-Type: application/json', 'Accept: application/json'];
+    public static function enviar(\stdClass $regla, array $peticion): array {
+        $cabeceras = ['Accept: application/json'];
+        if ($peticion['tipo'] !== '') {
+            $cabeceras[] = 'Content-Type: ' . $peticion['tipo'];
+        }
         $token = trim((string)$regla->token);
         if ($token !== '') {
             if ($regla->autenticacion === 'bearer') {
@@ -58,10 +88,13 @@ class cliente_api {
         ];
 
         $inicio = microtime(true);
-        $respuesta = $curl->post($regla->url, $cuerpo, $opciones);
+        if ($peticion['metodo'] === 'GET') {
+            $respuesta = $curl->get($peticion['url'], [], $opciones);
+        } else {
+            $respuesta = $curl->post($peticion['url'], $peticion['cuerpo'], $opciones);
+        }
         $duracion = (int)round((microtime(true) - $inicio) * 1000);
 
-        $info = $curl->get_info();
         // Error de red/tiempo (errno) o URL bloqueada por el security helper (solo deja $curl->error).
         $error = '';
         if (!empty($curl->error)) {
@@ -71,10 +104,52 @@ class cliente_api {
         }
 
         return [
-            'http' => (int)($info['http_code'] ?? 0),
+            'http' => (int)($curl->get_info()['http_code'] ?? 0),
             'cuerpo' => is_string($respuesta) ? $respuesta : '',
             'error' => $error,
             'duracionms' => $duracion,
+        ];
+    }
+
+    /**
+     * Texto legible de la peticion (pantalla Probar y Contrato).
+     *
+     * @param \stdClass $regla
+     * @param array $peticion
+     * @return string
+     */
+    public static function describir(\stdClass $regla, array $peticion): string {
+        $lineas = [$peticion['metodo'] . ' ' . $peticion['url']];
+        if ($peticion['tipo'] !== '') {
+            $lineas[] = 'Content-Type: ' . $peticion['tipo'];
+        }
+        if ($regla->autenticacion === 'bearer') {
+            $lineas[] = 'Authorization: Bearer ****';
+        } else if ($regla->autenticacion === 'cabecera') {
+            $lineas[] = $regla->cabeceranombre . ': ****';
+        }
+        if ($peticion['cuerpo'] !== '') {
+            $cuerpo = $peticion['cuerpo'];
+            $json = json_decode($cuerpo);
+            if ($json !== null) {
+                $cuerpo = json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }
+            $lineas[] = '';
+            $lineas[] = $cuerpo;
+        }
+        return implode("\n", $lineas);
+    }
+
+    /**
+     * Metodos para el selector.
+     *
+     * @return array
+     */
+    public static function metodos(): array {
+        return [
+            self::GET => get_string('metodo_get', 'local_reglasdeuda'),
+            self::POST_JSON => get_string('metodo_post_json', 'local_reglasdeuda'),
+            self::POST_FORM => get_string('metodo_post_form', 'local_reglasdeuda'),
         ];
     }
 

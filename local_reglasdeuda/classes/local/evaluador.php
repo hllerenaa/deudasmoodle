@@ -167,21 +167,16 @@ class evaluador {
     private static function consultar(\stdClass $regla, \stdClass $usuario, array $contexto): array {
         $salida = self::vacio();
 
-        $variables = plantilla::variables_usuario($regla, $usuario, $contexto);
-        if ($variables['identificador'] === '') {
-            // Sin identificador no hay a quien consultar (p.ej. usuario sin idnumber).
-            $salida['error'] = get_string('error_sinidentificador', 'local_reglasdeuda', $variables['tipo_identificador']);
+        $valores = parametros::valores($regla, $usuario, $faltante);
+        $peticion = cliente_api::peticion($regla, $valores);
+        $salida['peticion'] = cliente_api::describir($regla, $peticion);
+        if ($faltante !== null) {
+            // Sin el dato no hay a quien consultar (p.ej. usuario sin numero de ID).
+            $salida['error'] = get_string('error_sinvalor', 'local_reglasdeuda', $faltante);
             return self::aplicar_politica_error($regla, $salida);
         }
 
-        try {
-            $salida['peticion'] = plantilla::construir_cuerpo($regla->plantilla, $variables);
-        } catch (\invalid_parameter_exception $e) {
-            $salida['error'] = get_string('error_plantilla', 'local_reglasdeuda');
-            return self::aplicar_politica_error($regla, $salida);
-        }
-
-        $http = cliente_api::enviar($regla, $salida['peticion']);
+        $http = cliente_api::enviar($regla, $peticion);
         $salida['http'] = $http['http'];
         $salida['respuesta'] = $http['cuerpo'];
         $salida['duracionms'] = $http['duracionms'];

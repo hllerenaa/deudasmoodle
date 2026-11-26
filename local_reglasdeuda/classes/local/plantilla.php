@@ -17,7 +17,7 @@
 namespace local_reglasdeuda\local;
 
 /**
- * Variables {nombre} y {datos.campo}: armado del cuerpo JSON y de los mensajes.
+ * Variables {nombre} y {datos.campo} de los mensajes.
  *
  * Sin dependencias de Moodle salvo en variables_usuario(), para poder probarse aislada.
  *
@@ -29,25 +29,11 @@ class plantilla {
     /** Patron de una variable: {firstname}, {datos.total}, {datos.cliente.nombre}. */
     const PATRON = '/\{([a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)*)\}/';
 
-    /** Plantilla JSON por defecto del cuerpo enviado a la API. */
-    const CUERPO_POR_DEFECTO = <<<'JSON'
-{
-    "regla": "{regla}",
-    "identificador": "{identificador}",
-    "tipo_identificador": "{tipo_identificador}",
-    "usuario": {
-        "username": "{username}",
-        "email": "{email}",
-        "idnumber": "{idnumber}"
-    }
-}
-JSON;
-
     /** Variables de usuario y curso siempre disponibles (nombre => clave de cadena de ayuda). */
     const VARIABLES_FIJAS = [
-        'usuario' => ['firstname', 'lastname', 'fullname', 'username', 'idnumber', 'email', 'identificador'],
+        'usuario' => ['firstname', 'lastname', 'fullname', 'username', 'idnumber', 'email'],
         'curso' => ['course_fullname', 'course_shortname', 'cmid'],
-        'regla' => ['regla', 'tipo_identificador'],
+        'regla' => ['regla'],
     ];
 
     /**
@@ -59,12 +45,9 @@ JSON;
      * @return array nombre => valor (cadenas)
      */
     public static function variables_usuario(\stdClass $regla, \stdClass $usuario, array $contexto = []): array {
-        $campo = in_array($regla->identificador, ['username', 'idnumber', 'email'], true) ? $regla->identificador : 'idnumber';
         $curso = $contexto['curso'] ?? null;
         return [
             'regla' => (string)$regla->nombre,
-            'tipo_identificador' => $campo,
-            'identificador' => (string)($usuario->$campo ?? ''),
             'userid' => (string)($usuario->id ?? ''),
             'username' => (string)($usuario->username ?? ''),
             'idnumber' => (string)($usuario->idnumber ?? ''),
@@ -91,53 +74,6 @@ JSON;
             $valor = array_key_exists($m[1], $variables) ? (string)$variables[$m[1]] : '';
             return $escapar ? $escapar($valor) : $valor;
         }, $texto);
-    }
-
-    /**
-     * Construye el cuerpo JSON: decodifica la plantilla y reemplaza variables solo dentro de las
-     * cadenas, de modo que ningun valor (comillas, barras) pueda romper o alterar la estructura.
-     *
-     * @param string $plantillajson plantilla JSON valida
-     * @param array $variables nombre => valor
-     * @return string JSON listo para enviar
-     * @throws \invalid_parameter_exception si la plantilla no es JSON valido
-     */
-    public static function construir_cuerpo(string $plantillajson, array $variables): string {
-        // Sin assoc: asi un {} vacio de la plantilla sigue siendo objeto y no se convierte en [].
-        $estructura = json_decode($plantillajson);
-        if (!is_object($estructura) && !is_array($estructura)) {
-            throw new \invalid_parameter_exception('Plantilla JSON invalida: ' . json_last_error_msg());
-        }
-        $json = json_encode(self::reemplazar_en($estructura, $variables),
-            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE);
-        if ($json === false) {
-            throw new \invalid_parameter_exception('No se pudo generar el JSON: ' . json_last_error_msg());
-        }
-        return $json;
-    }
-
-    /**
-     * Reemplaza variables en todas las cadenas de una estructura JSON decodificada.
-     *
-     * @param mixed $nodo
-     * @param array $variables
-     * @return mixed
-     */
-    private static function reemplazar_en($nodo, array $variables) {
-        if (is_string($nodo)) {
-            return self::reemplazar($nodo, $variables);
-        }
-        if (is_array($nodo)) {
-            return array_map(function($hijo) use ($variables) {
-                return self::reemplazar_en($hijo, $variables);
-            }, $nodo);
-        }
-        if (is_object($nodo)) {
-            foreach (get_object_vars($nodo) as $clave => $hijo) {
-                $nodo->$clave = self::reemplazar_en($hijo, $variables);
-            }
-        }
-        return $nodo;
     }
 
     /**

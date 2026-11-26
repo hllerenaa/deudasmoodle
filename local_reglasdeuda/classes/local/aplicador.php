@@ -63,10 +63,14 @@ class aplicador {
         if (CLI_SCRIPT || during_initial_install() || !empty($CFG->upgraderunning)) {
             return;
         }
-        if (!get_config('local_reglasdeuda', 'habilitado') || !isloggedin() || isguestuser()) {
+        if (!isloggedin() || isguestuser()) {
             return;
         }
         if ((defined('NO_SITEPOLICY_CHECK') && NO_SITEPOLICY_CHECK) || self::script_libre((string)$SCRIPT)) {
+            return;
+        }
+        self::ir_a_configuracion_tras_instalar($preventredirect);
+        if (!get_config('local_reglasdeuda', 'habilitado')) {
             return;
         }
         $reglas = reglas::activas();
@@ -105,6 +109,23 @@ class aplicador {
                 }
             }
         }
+    }
+
+    /**
+     * Tras instalar o actualizar, lleva al administrador a la pantalla del plugin una sola vez,
+     * cuando Moodle ya no tiene actualizaciones pendientes.
+     *
+     * @param bool $preventredirect
+     */
+    private static function ir_a_configuracion_tras_instalar(bool $preventredirect): void {
+        if ($preventredirect || AJAX_SCRIPT || (defined('WS_SERVER') && WS_SERVER) || !is_siteadmin()) {
+            return;
+        }
+        if (!get_config('local_reglasdeuda', 'irconfiguracion') || (function_exists('moodle_needs_upgrading') && moodle_needs_upgrading())) {
+            return;
+        }
+        unset_config('irconfiguracion', 'local_reglasdeuda');
+        redirect(new \moodle_url('/local/reglasdeuda/index.php'));
     }
 
     /**

@@ -22,16 +22,17 @@
  */
 
 use local_reglasdeuda\form\regla_form;
+use local_reglasdeuda\local\parametros;
+use local_reglasdeuda\local\pestanas;
 use local_reglasdeuda\local\reglas;
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->libdir . '/adminlib.php');
 
 $id = optional_param('id', 0, PARAM_INT);
 
-admin_externalpage_setup('local_reglasdeuda_reglas');
 $url = new moodle_url('/local/reglasdeuda/editar.php', ['id' => $id]);
-$PAGE->set_url($url);
+$titulo = get_string($id ? 'editarregla' : 'nuevaregla', 'local_reglasdeuda');
+pestanas::configurar_pagina($url, $titulo);
 $listado = new moodle_url('/local/reglasdeuda/index.php');
 
 $regla = $id ? reglas::obtener($id) : reglas::por_defecto();
@@ -39,15 +40,22 @@ if (!$regla) {
     throw new moodle_exception('invalidrecord', 'error', $listado);
 }
 
-// Registro => formulario: CSV a listas y mensaje al formato del editor.
+// Registro => formulario: CSV a listas, parametros a filas y mensaje al formato del editor.
 $datos = clone $regla;
 $datos->globalmodulos = reglas::csv($regla->globalmodulos);
 $datos->globalcategorias = reglas::csv($regla->globalcategorias);
 $datos->globalcursos = reglas::csv($regla->globalcursos);
 $datos->rolesexentos = reglas::csv($regla->rolesexentos);
 $datos->mensaje_editor = ['text' => (string)$regla->mensaje, 'format' => (int)$regla->mensajeformat];
+$lista = parametros::de_regla($regla);
+foreach ($lista as $i => $p) {
+    $datos->param_nombre[$i] = $p['nombre'];
+    $datos->param_campo[$i] = $p['campo'];
+    $datos->param_valor[$i] = $p['valor'];
+}
 
-$form = new regla_form($url);
+// Una fila vacia extra para agregar un parametro sin pulsar el boton.
+$form = new regla_form($url, ['numparametros' => count($lista) + 1]);
 $form->set_data($datos);
 
 if ($form->is_cancelled()) {
@@ -61,6 +69,7 @@ if ($enviado = $form->get_data()) {
         }
     }
     $guardar->id = $id;
+    $guardar->parametros = json_encode(array_values(regla_form::parametros_enviados($enviado)), JSON_UNESCAPED_UNICODE);
     $guardar->globalmodulos = implode(',', $enviado->globalmodulos ?? []);
     $guardar->globalcategorias = implode(',', array_map('intval', $enviado->globalcategorias ?? []));
     $guardar->globalcursos = implode(',', array_map('intval', (array)($enviado->globalcursos ?? [])));
@@ -80,8 +89,8 @@ if ($enviado = $form->get_data()) {
 // Selector de variables (la configuracion viaja en data-config del contenedor, ver regla_form).
 $PAGE->requires->js_call_amd('local_reglasdeuda/variables', 'init', ['local-reglasdeuda-variables']);
 
-$PAGE->set_title(get_string($id ? 'editarregla' : 'nuevaregla', 'local_reglasdeuda'));
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string($id ? 'editarregla' : 'nuevaregla', 'local_reglasdeuda'));
+echo pestanas::html($id ? 'reglas' : 'nueva');
+echo $OUTPUT->heading($titulo, 3);
 $form->display();
 echo $OUTPUT->footer();

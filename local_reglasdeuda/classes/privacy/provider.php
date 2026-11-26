@@ -41,6 +41,7 @@ class provider implements
             'fullname' => 'privacy:metadata:apiexterna:fullname',
             'idnumber' => 'privacy:metadata:apiexterna:idnumber',
             'email' => 'privacy:metadata:apiexterna:email',
+            'profile' => 'privacy:metadata:apiexterna:profile',
             'course' => 'privacy:metadata:apiexterna:course',
         ], 'privacy:metadata:apiexterna');
         return $collection;

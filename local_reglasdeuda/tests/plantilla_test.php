@@ -40,21 +40,6 @@ final class plantilla_test extends \advanced_testcase {
         $this->assertSame('<b>&lt;script&gt;alert(1)&lt;/script&gt;</b>', $texto);
     }
 
-    public function test_construir_cuerpo_no_rompe_el_json(): void {
-        $json = plantilla::construir_cuerpo('{"id": "{username}", "n": 5, "o": {"e": "x-{email}"}}',
-            ['username' => 'a"b\\c', 'email' => 'e@x.com']);
-        $this->assertSame(['id' => 'a"b\\c', 'n' => 5, 'o' => ['e' => 'x-e@x.com']], json_decode($json, true));
-    }
-
-    public function test_construir_cuerpo_conserva_objetos_vacios(): void {
-        $this->assertSame('{"a":{},"b":[]}', plantilla::construir_cuerpo('{"a": {}, "b": []}', []));
-    }
-
-    public function test_construir_cuerpo_plantilla_invalida(): void {
-        $this->expectException(\invalid_parameter_exception::class);
-        plantilla::construir_cuerpo('{no es json', []);
-    }
-
     public function test_aplanar_y_obtener_ruta(): void {
         $datos = ['total' => 235.5, 'cliente' => ['nombre' => 'Ana', 'activo' => true], 'mal-clave' => 1, 'nulo' => null];
         $this->assertSame([
