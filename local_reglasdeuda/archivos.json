@@ -2,7 +2,7 @@
  "ajustes.php": "b92cefc4063c6a12752a999a25e2b1750fcb5a37",
  "amd/build/variables.min.js": "acaf6025d8a49581f02bf0d6b2e0785a669ffc2a",
  "amd/src/variables.js": "acaf6025d8a49581f02bf0d6b2e0785a669ffc2a",
- "bloqueado.php": "81eabbe6b8e66a08c6bf5f20e0fd4836e8018d79",
+ "bloqueado.php": "ff5ed32c93e3fbb830209d6a6d4b0e7784d8dfe0",
  "classes/hook_callbacks.php": "9c7a6c774505d3a59faf03846e8afb037762172d",
  "classes/local/aplicador.php": "6532900182190890bdee35c1253cd7d526c7cb25",
  "classes/local/archivos.php": "d7a731a2aa7a18ec581f1fa11c5aa3458b7c0b28",
@@ -34,5 +34,5 @@
  "settings.php": "c117a4517abdd94cb80d241b63ce377f033d9f70",
  "tests/plantilla_test.php": "c64a011c063570e8d698c6d178c56d16f99718b1",
  "verificar.php": "95a10d5a5c80e33dbb1d3457e268f02a34d68ade",
- "version.php": "366be9542b1f25a9adc1132bf86ed98ea41a3178"
+ "version.php": "ad905a30dac3fed64a645c3aa627bcf1c77d8e36"
 }

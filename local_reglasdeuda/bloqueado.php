@@ -60,6 +60,11 @@ $regla = reglas::obtener($reglaid);
 if (!$regla || !$regla->activa || evaluador::esta_exento($regla, (int)$USER->id)) {
     redirect($destino);
 }
+// La pagina que cierra la sesion es solo para "Bloquear acceso a la plataforma". Con "Solo mostrar
+// mensaje" (o si la regla cambio de accion) se deja pasar: nunca se cierra la sesion.
+if (!$curso && $regla->accion !== reglas::ACCION_BLOQUEAR) {
+    redirect($destino);
+}
 $contexto = ['curso' => $curso, 'cmid' => $cmid ?: null];
 $evaluacion = evaluador::evaluar($regla, $USER, $contexto);
 if (!$evaluacion['aplica']) {
@@ -92,6 +97,9 @@ if ($cmid) {
     evaluador::olvidar_usuario((int)$USER->id); // Al volver a ingresar se consulta de nuevo la API.
     require_logout();
     $SESSION->local_reglasdeuda_sesioncerrada = true;
+    // Al volver a ingresar, ir a la pagina de inicio y no de vuelta a esta pagina (Moodle usaria la
+    // pagina anterior como destino); si sigue con deuda, el plugin lo vuelve a revisar al ingresar.
+    $SESSION->wantsurl = $CFG->wwwroot . '/';
     $PAGE->set_context(context_system::instance());
     $PAGE->set_pagelayout('login');
     $titulo = get_string('sesioncerrada', 'local_reglasdeuda');
