@@ -183,6 +183,10 @@ class local_reglasdeuda_editor_regla extends \moodleform {
         $f->addHelpButton('globalcursos', 'globalcursos', $c);
         $f->hideIf('globalcursos', 'recursos', 'notchecked');
         $f->hideIf('globalcursos', 'globalactivo', 'notchecked');
+        // Bloqueo por el administrador (opcional): oculto en "Mostrar mas...". Lo normal es que bloquee el docente.
+        foreach (['actividades', 'globalactivo', 'globalmodulos', 'globalcategorias', 'globalcursos'] as $avanzado) {
+            $f->setAdvanced($avanzado);
+        }
         $f->addElement('static', 'quienes', get_string('quienes', $c), get_string('quienes_desc', $c));
 
         // Mensaje.
