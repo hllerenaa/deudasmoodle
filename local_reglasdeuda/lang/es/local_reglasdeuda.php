@@ -249,3 +249,6 @@ $string['cm_excepciones'] = 'Pueden realizarla igual';
 $string['cm_excepciones_help'] = 'Estudiantes que, aunque tengan deuda, pueden entregar o realizar esta actividad. Igual ven el mensaje.';
 $string['ninguno'] = 'Ninguno';
 $string['accion_no_disponible'] = 'No disponible: tiene valores pendientes';
+$string['actividadbloqueada'] = 'Actividad bloqueada por valores pendientes';
+$string['actividadbloqueada_desc'] = 'No puede abrir "{$a}" porque tiene valores pendientes. Cuando regularice su pago podra entrar con normalidad.';
+$string['cursobloqueado_desc'] = 'No puede entrar a esta parte del curso "{$a}" porque tiene valores pendientes.';

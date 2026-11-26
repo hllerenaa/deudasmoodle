@@ -66,11 +66,45 @@ if (!$evaluacion['aplica']) {
     redirect($destino);
 }
 
-$PAGE->set_pagelayout($encurso ? 'standard' : 'login');
-$PAGE->set_title(get_string('accesorestringido', 'local_reglasdeuda'));
-$PAGE->set_heading($SITE->fullname);
+// Dentro del curso/actividad: migas de pan, menu del curso y nombre del curso arriba, para que se
+// entienda que actividad esta bloqueada.
+$titulo = get_string('accesorestringido', 'local_reglasdeuda');
+$explicacion = '';
+if ($cmid) {
+    $PAGE->set_cm($cm, $curso);
+    $PAGE->set_pagelayout('incourse');
+    // La cabecera propia de Moodle muestra el nombre y la descripcion de la actividad.
+    $PAGE->activityheader->set_attrs(['hidecompletion' => true]);
+    $nombre = format_string($cm->name, true, ['context' => $PAGE->context]);
+    $titulo = $nombre;
+    $explicacion = get_string('actividadbloqueada_desc', 'local_reglasdeuda', $nombre);
+    $PAGE->set_title($nombre . ' | ' . format_string($curso->fullname));
+    $PAGE->set_heading(format_string($curso->fullname));
+} else if ($encurso) {
+    $PAGE->set_course($curso);
+    $PAGE->set_pagelayout('incourse');
+    $explicacion = get_string('cursobloqueado_desc', 'local_reglasdeuda', format_string($curso->fullname));
+    $PAGE->set_title($titulo . ' | ' . format_string($curso->fullname));
+    $PAGE->set_heading(format_string($curso->fullname));
+} else {
+    $PAGE->set_pagelayout('login');
+    $PAGE->set_title($titulo);
+    $PAGE->set_heading($SITE->fullname);
+}
 
 echo $OUTPUT->header();
+if ($encurso) {
+    // Algunos temas (Boost) no muestran el nombre del curso en las paginas de actividad.
+    echo html_writer::div(get_string('course') . ': ' . html_writer::link($volver,
+        format_string($curso->fullname, true, ['context' => context_course::instance($curso->id)])), 'mb-1');
+}
+if ($cmid) {
+    echo html_writer::div(html_writer::span('🔒 ' . get_string('actividadbloqueada', 'local_reglasdeuda'),
+        'badge bg-danger badge-danger', ['style' => 'font-size:.95rem;padding:.4em .7em']), 'mb-2');
+}
+if ($explicacion !== '') {
+    echo html_writer::tag('p', $explicacion, ['class' => 'lead']);
+}
 echo mensaje::html(mensaje::contexto($regla, $evaluacion, $USER, $contexto));
 
 if ($encurso) {

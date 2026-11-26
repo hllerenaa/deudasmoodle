@@ -249,3 +249,6 @@ $string['cm_excepciones'] = 'Can still do it';
 $string['cm_excepciones_help'] = 'Students who, even with debt, can submit or do this activity. They still see the message.';
 $string['ninguno'] = 'None';
 $string['accion_no_disponible'] = 'Not available: you have pending payments';
+$string['actividadbloqueada'] = 'Activity blocked due to pending payments';
+$string['actividadbloqueada_desc'] = 'You cannot open "{$a}" because you have pending payments. Once you pay you will be able to enter normally.';
+$string['cursobloqueado_desc'] = 'You cannot enter this part of the course "{$a}" because you have pending payments.';

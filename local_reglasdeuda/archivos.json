@@ -2,7 +2,7 @@
  "ajustes.php": "b92cefc4063c6a12752a999a25e2b1750fcb5a37",
  "amd/build/variables.min.js": "acaf6025d8a49581f02bf0d6b2e0785a669ffc2a",
  "amd/src/variables.js": "acaf6025d8a49581f02bf0d6b2e0785a669ffc2a",
- "bloqueado.php": "2358c2ca7d2464f9fc3a14f0ec0176baedbbbfbd",
+ "bloqueado.php": "874a867985b124a70f42491a041b007cd54779bb",
  "classes/hook_callbacks.php": "9c7a6c774505d3a59faf03846e8afb037762172d",
  "classes/local/aplicador.php": "14c23febbf6b625e0083bd04fc2625ea0e0d14c8",
  "classes/local/archivos.php": "d7a731a2aa7a18ec581f1fa11c5aa3458b7c0b28",
@@ -27,12 +27,12 @@
  "diagnostico.php": "39d02d84c1e4bfc27cdea7a501d39fcd1eb32525",
  "editar.php": "f6da22cc2993f300bda3af135dbbecdc114b86a6",
  "index.php": "d527a282025955cdfc43a49f38a12e3fe0410add",
- "lang/en/local_reglasdeuda.php": "28864b2f353ae93d9730ac2b295f94c04ac99d5f",
- "lang/es/local_reglasdeuda.php": "d37fcc236ddd977b44350cb19754b39f5419e8fc",
+ "lang/en/local_reglasdeuda.php": "74a9497f24390f8c61b359127c4356e24f38db95",
+ "lang/es/local_reglasdeuda.php": "d07d67716e1d66219dc85441ddc08f8d5252ba92",
  "lib.php": "0a7ef68326582ca0e405d6e3238c82f56090e673",
  "probar.php": "a7d18b6674f0b68db3acee507fb7c087a902e83b",
  "settings.php": "c117a4517abdd94cb80d241b63ce377f033d9f70",
  "tests/plantilla_test.php": "c64a011c063570e8d698c6d178c56d16f99718b1",
  "verificar.php": "95a10d5a5c80e33dbb1d3457e268f02a34d68ade",
- "version.php": "8de6c53ef1a4f067a37c08b798ee481c98bc69c3"
+ "version.php": "0c63b9beab7d760626563a1657f0814bdc79ba1b"
 }
