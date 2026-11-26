@@ -4,7 +4,7 @@
  "amd/src/variables.js": "acaf6025d8a49581f02bf0d6b2e0785a669ffc2a",
  "bloqueado.php": "81eabbe6b8e66a08c6bf5f20e0fd4836e8018d79",
  "classes/hook_callbacks.php": "9c7a6c774505d3a59faf03846e8afb037762172d",
- "classes/local/aplicador.php": "3332cdda103678af7faeb3ac6d6b786a12688975",
+ "classes/local/aplicador.php": "6532900182190890bdee35c1253cd7d526c7cb25",
  "classes/local/archivos.php": "d7a731a2aa7a18ec581f1fa11c5aa3458b7c0b28",
  "classes/local/cliente_api.php": "8eafe58d736adcc2541ec2a825601fde4139fc8f",
  "classes/local/evaluador.php": "65c4cc65788b5ce86deec142e142a29d85e4364c",
@@ -34,5 +34,5 @@
  "settings.php": "c117a4517abdd94cb80d241b63ce377f033d9f70",
  "tests/plantilla_test.php": "c64a011c063570e8d698c6d178c56d16f99718b1",
  "verificar.php": "95a10d5a5c80e33dbb1d3457e268f02a34d68ade",
- "version.php": "ebfba9e0db94ba6132cfc4f6e51cbf9f2e5f4e54"
+ "version.php": "366be9542b1f25a9adc1132bf86ed98ea41a3178"
 }

@@ -60,7 +60,7 @@ class aplicador {
      * Administradores y docentes quedan exentos (evaluador::esta_exento). Nunca rompe el ingreso.
      */
     public static function al_ingresar(): void {
-        global $SESSION, $CFG;
+        global $SESSION, $CFG, $USER;
         try {
             if (CLI_SCRIPT || !empty($CFG->upgraderunning) || !get_config('local_reglasdeuda', 'habilitado')) {
                 return;
@@ -68,6 +68,9 @@ class aplicador {
             if (!isloggedin() || isguestuser() || \core\session\manager::is_loggedinas()) {
                 return;
             }
+            // Al ingresar siempre se consulta la API de nuevo: una respuesta guardada podia venir de antes
+            // de cargar la cedula (p. ej. cuentas de Microsoft con el Numero de ID vacio) o de antes de la deuda.
+            evaluador::olvidar_usuario((int)$USER->id);
             foreach (reglas::activas_por_accion(reglas::ACCION_BLOQUEAR) as $regla) {
                 if (self::aplica($regla, ['curso' => null, 'cmid' => null])) {
                     $SESSION->wantsurl = (new \moodle_url('/local/reglasdeuda/bloqueado.php',
