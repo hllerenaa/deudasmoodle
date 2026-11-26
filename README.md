@@ -63,8 +63,7 @@ Petición `POST` JSON (plantilla editable por regla):
   "regla": "Deuda",
   "identificador": "0912345678",
   "tipo_identificador": "idnumber",
-  "usuario": {"username": "jperez", "email": "jperez@uni.edu.ec", "idnumber": "0912345678"},
-  "contexto": {"curso": "MAT101", "actividad": "42"}
+  "usuario": {"username": "jperez", "email": "jperez@uni.edu.ec", "idnumber": "0912345678"}
 }
 ```
 

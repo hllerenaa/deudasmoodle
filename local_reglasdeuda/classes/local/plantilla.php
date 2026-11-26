@@ -39,10 +39,6 @@ class plantilla {
         "username": "{username}",
         "email": "{email}",
         "idnumber": "{idnumber}"
-    },
-    "contexto": {
-        "curso": "{course_shortname}",
-        "actividad": "{cmid}"
     }
 }
 JSON;

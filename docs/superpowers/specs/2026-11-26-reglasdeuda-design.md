@@ -66,8 +66,7 @@ Cuerpo (plantilla editable, se validan como JSON):
   "regla": "{regla}",
   "identificador": "{identificador}",
   "tipo_identificador": "{tipo_identificador}",
-  "usuario": {"username": "{username}", "email": "{email}", "idnumber": "{idnumber}"},
-  "contexto": {"curso": "{course_shortname}", "actividad": "{cmid}"}
+  "usuario": {"username": "{username}", "email": "{email}", "idnumber": "{idnumber}"}
 }
 ```
 
