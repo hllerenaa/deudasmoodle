@@ -20,7 +20,8 @@ namespace local_reglasdeuda\local;
  * Ejecuta las acciones de las reglas en cada require_login: bloquear plataforma,
  * bloqueo global de actividades y avisos en Area personal / cursos.
  *
- * La restriccion por actividad la hace availability_reglasdeuda.
+ * Las reglas "bloquear recursos" cubren actividades concretas (por cmid) y/o todas las que
+ * cumplan los filtros de tipo, categoria y curso.
  *
  * @package    local_reglasdeuda
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -107,7 +108,7 @@ class aplicador {
     }
 
     /**
-     * La regla global de restriccion cubre esta actividad (tipo y categoria).
+     * La regla de restriccion cubre esta actividad: esta en la lista concreta o cumple los filtros.
      *
      * @param \stdClass $regla
      * @param \cm_info|\stdClass $cm
@@ -115,7 +116,14 @@ class aplicador {
      * @return bool
      */
     public static function cubre_actividad(\stdClass $regla, $cm, \stdClass $curso): bool {
+        if (in_array((int)$cm->id, array_map('intval', reglas::csv($regla->actividades)), true)) {
+            return true;
+        }
         if (empty($regla->globalactivo)) {
+            return false;
+        }
+        $cursos = array_map('intval', reglas::csv($regla->globalcursos));
+        if ($cursos && !in_array((int)$curso->id, $cursos, true)) {
             return false;
         }
         $modulos = reglas::csv($regla->globalmodulos);

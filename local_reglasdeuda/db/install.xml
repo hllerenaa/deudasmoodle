@@ -24,9 +24,11 @@
         <FIELD NAME="errorpolitica" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="permitir" SEQUENCE="false" COMMENT="permitir o aplicar"/>
         <FIELD NAME="cachettl" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="900" SEQUENCE="false"/>
         <FIELD NAME="accion" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="avisar" SEQUENCE="false" COMMENT="bloquear, restringir o avisar"/>
+        <FIELD NAME="actividades" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de cmid bloqueados concretamente"/>
         <FIELD NAME="globalactivo" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="globalmodulos" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de modname; vacio = todos"/>
         <FIELD NAME="globalcategorias" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de ids de categoria; vacio = todas"/>
+        <FIELD NAME="globalcursos" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de ids de curso; vacio = todos"/>
         <FIELD NAME="rolesexentos" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de ids de rol"/>
         <FIELD NAME="titulo" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="mensaje" TYPE="text" NOTNULL="false" SEQUENCE="false"/>

@@ -115,3 +115,13 @@ Respuesta esperada (HTTP 200):
   usa el enlace de respaldo de la regla; si tampoco hay, no se muestra botón.
 - Hosts internos (API en red privada) solo si el admin activa
   "Permitir hosts internos" en los ajustes generales.
+
+## Cambio 2026-11-26: un solo plugin
+
+Se pidió un único ZIP. Se eliminó `availability_reglasdeuda` (Moodle instala un
+plugin por ZIP y la condición de "Restringir acceso" exige su propio tipo de
+plugin). El bloqueo de recursos ahora se define solo en la regla: actividades
+concretas por ID (`actividades`) y/o filtros por tipo, categoría y curso
+(`globalactivo`, `globalmodulos`, `globalcategorias`, `globalcursos`). Los
+docentes ya no configuran la restricción por actividad; la actividad sigue
+visible y el usuario ve el mensaje al entrar.

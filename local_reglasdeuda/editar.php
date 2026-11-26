@@ -43,6 +43,7 @@ if (!$regla) {
 $datos = clone $regla;
 $datos->globalmodulos = reglas::csv($regla->globalmodulos);
 $datos->globalcategorias = reglas::csv($regla->globalcategorias);
+$datos->globalcursos = reglas::csv($regla->globalcursos);
 $datos->rolesexentos = reglas::csv($regla->rolesexentos);
 $datos->mensaje_editor = ['text' => (string)$regla->mensaje, 'format' => (int)$regla->mensajeformat];
 
@@ -62,10 +63,15 @@ if ($enviado = $form->get_data()) {
     $guardar->id = $id;
     $guardar->globalmodulos = implode(',', $enviado->globalmodulos ?? []);
     $guardar->globalcategorias = implode(',', array_map('intval', $enviado->globalcategorias ?? []));
+    $guardar->globalcursos = implode(',', array_map('intval', (array)($enviado->globalcursos ?? [])));
+    $guardar->actividades = implode(',', array_unique(array_map('intval', reglas::csv($enviado->actividades ?? ''))));
     $guardar->rolesexentos = implode(',', array_map('intval', $enviado->rolesexentos ?? []));
     $guardar->mensaje = $enviado->mensaje_editor['text'];
     $guardar->mensajeformat = (int)$enviado->mensaje_editor['format'];
-    $guardar->globalactivo = $guardar->accion === reglas::ACCION_RESTRINGIR ? (int)$guardar->globalactivo : 0;
+    if ($guardar->accion !== reglas::ACCION_RESTRINGIR) {
+        $guardar->globalactivo = 0;
+        $guardar->actividades = '';
+    }
     $nuevoid = reglas::guardar($guardar);
     redirect(new moodle_url('/local/reglasdeuda/probar.php', ['id' => $nuevoid]),
         get_string('reglaguardada', 'local_reglasdeuda'), null, \core\output\notification::NOTIFY_SUCCESS);

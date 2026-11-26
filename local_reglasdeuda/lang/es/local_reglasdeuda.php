@@ -34,7 +34,7 @@ $string['accion_bloquear'] = 'Bloquear acceso a la plataforma';
 $string['accion_help'] = 'Que ocurre cuando la regla se activa:
 
 * **Bloquear plataforma**: al iniciar sesion el usuario ve el mensaje y no puede navegar.
-* **Bloquear recursos**: las actividades con la condicion "Regla de deuda" (Restringir acceso) quedan cerradas; opcionalmente tambien todas las de ciertos tipos y categorias (bloqueo global).
+* **Bloquear recursos**: al intentar entrar a las actividades elegidas (por ID, o todas las de ciertos tipos, categorias y cursos) ve el mensaje y un boton para volver al curso.
 * **Solo mensaje**: puede entrar a todo; ve el aviso en el Area personal y al entrar a cada curso.';
 $string['accion_restringir'] = 'Bloquear recursos';
 $string['activa'] = 'Activa';
@@ -90,8 +90,8 @@ $string['estilo_danger'] = 'Peligro (rojo)';
 $string['estilo_info'] = 'Informacion (azul)';
 $string['estilo_warning'] = 'Advertencia (amarillo)';
 $string['global'] = 'global';
-$string['globalactivo'] = 'Bloqueo global';
-$string['globalactivo_help'] = 'Ademas de las actividades donde el docente agregue la condicion, bloquea automaticamente las actividades de los tipos y categorias elegidos, sin configurarlas una por una. Este bloqueo no aparece en "Restringir acceso" de la actividad: el usuario ve el mensaje al intentar entrar.';
+$string['globalactivo'] = 'Bloquear tambien por tipo, categoria o curso';
+$string['globalactivo_help'] = 'Ademas de las actividades por ID, bloquea todas las que cumplan los filtros de tipo de actividad, categoria y curso (un filtro vacio = todos). La actividad se sigue viendo en el curso; el usuario ve el mensaje al intentar entrar.';
 $string['globalcategorias'] = 'Categorias (incluye subcategorias)';
 $string['globalcategorias_help'] = 'Vacio = todas las categorias.';
 $string['globalmodulos'] = 'Tipos de actividad';
@@ -181,3 +181,11 @@ $string['cachedef_resultados'] = 'Resultados de la API por regla y usuario';
 $string['error_token'] = 'El token no puede contener saltos de linea.';
 $string['privacy:metadata:apiexterna:fullname'] = 'Nombre y apellido del usuario.';
 $string['privacy:metadata:apiexterna:userid'] = 'Id del usuario en Moodle.';
+$string['actividades'] = 'Actividades (IDs)';
+$string['actividades_help'] = 'IDs de las actividades a bloquear, separados por comas. El ID aparece en la direccion de la actividad: .../mod/quiz/view.php?id=42.';
+$string['error_actividades'] = 'Solo numeros separados por comas.';
+$string['error_actividadesnoexisten'] = 'Alguno de los IDs no corresponde a una actividad existente.';
+$string['error_sinalcance'] = 'Indique al menos una actividad o marque el bloqueo por tipo, categoria o curso.';
+$string['globalcursos'] = 'Cursos';
+$string['globalcursos_help'] = 'Vacio = todos los cursos.';
+$string['nactividades'] = '{$a} actividad(es)';

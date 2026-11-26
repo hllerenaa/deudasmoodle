@@ -123,6 +123,10 @@ class regla_form extends \moodleform {
         $f->setExpanded('h_accion');
         $f->addElement('select', 'accion', get_string('accion', $c), reglas::opciones_accion());
         $f->addHelpButton('accion', 'accion', $c);
+        $f->addElement('text', 'actividades', get_string('actividades', $c), ['size' => 40]);
+        $f->setType('actividades', PARAM_RAW_TRIMMED);
+        $f->addHelpButton('actividades', 'actividades', $c);
+        $f->hideIf('actividades', 'accion', 'neq', reglas::ACCION_RESTRINGIR);
         $f->addElement('advcheckbox', 'globalactivo', get_string('globalactivo', $c));
         $f->addHelpButton('globalactivo', 'globalactivo', $c);
         $f->hideIf('globalactivo', 'accion', 'neq', reglas::ACCION_RESTRINGIR);
@@ -135,6 +139,11 @@ class regla_form extends \moodleform {
         $f->addHelpButton('globalcategorias', 'globalcategorias', $c);
         $f->hideIf('globalcategorias', 'accion', 'neq', reglas::ACCION_RESTRINGIR);
         $f->hideIf('globalcategorias', 'globalactivo', 'notchecked');
+        $f->addElement('course', 'globalcursos', get_string('globalcursos', $c),
+            ['multiple' => true, 'includefrontpage' => false, 'noselectionstring' => get_string('todos', $c)]);
+        $f->addHelpButton('globalcursos', 'globalcursos', $c);
+        $f->hideIf('globalcursos', 'accion', 'neq', reglas::ACCION_RESTRINGIR);
+        $f->hideIf('globalcursos', 'globalactivo', 'notchecked');
         $f->addElement('autocomplete', 'rolesexentos', get_string('rolesexentos', $c), self::roles(),
             ['multiple' => true, 'noselectionstring' => get_string('ninguno', $c)]);
         $f->addHelpButton('rolesexentos', 'rolesexentos', $c);
@@ -168,6 +177,7 @@ class regla_form extends \moodleform {
     }
 
     public function validation($data, $files) {
+        global $DB;
         $errores = parent::validation($data, $files);
         $c = 'local_reglasdeuda';
 
@@ -193,6 +203,19 @@ class regla_form extends \moodleform {
         }
         if (trim($data['botonurlrespaldo']) !== '' && !mensaje::es_url_web(trim($data['botonurlrespaldo']))) {
             $errores['botonurlrespaldo'] = get_string('error_url', $c);
+        }
+        if ($data['accion'] === reglas::ACCION_RESTRINGIR) {
+            $cmids = reglas::csv($data['actividades']);
+            $novalidos = array_filter($cmids, function($v) {
+                return !ctype_digit($v);
+            });
+            if ($novalidos) {
+                $errores['actividades'] = get_string('error_actividades', $c);
+            } else if ($cmids && count(array_unique($cmids)) !== $DB->count_records_list('course_modules', 'id', $cmids)) {
+                $errores['actividades'] = get_string('error_actividadesnoexisten', $c);
+            } else if (!$cmids && empty($data['globalactivo'])) {
+                $errores['actividades'] = get_string('error_sinalcance', $c);
+            }
         }
         if ($data['cachettl'] < reglas::TTL_MINIMO || $data['cachettl'] > reglas::TTL_MAXIMO) {
             $errores['cachettl'] = get_string('error_cachettl', $c);

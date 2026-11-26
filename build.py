@@ -2,9 +2,7 @@
 """Empaqueta los plugins en dist/ listos para instalar desde
 Administracion del sitio > Extensiones > Instalar extensiones.
 
-Genera dos ZIP (instalar primero local_reglasdeuda):
-    dist/local_reglasdeuda_<release>.zip         -> local/reglasdeuda
-    dist/availability_reglasdeuda_<release>.zip  -> availability/condition/reglasdeuda
+Genera dist/local_reglasdeuda_<release>.zip -> local/reglasdeuda
 
 Moodle exige que la carpeta raiz del ZIP sea el nombre del plugin sin el tipo
 ("reglasdeuda"), por eso se renombra al comprimir.
@@ -22,7 +20,7 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-PLUGINS = ["local_reglasdeuda", "availability_reglasdeuda"]
+PLUGINS = ["local_reglasdeuda"]
 DIST = ROOT / "dist"
 ENCODING = "utf-8"
 
@@ -123,7 +121,6 @@ def main():
         update_versions(args.bump, args.release)
     for plugin in PLUGINS:
         build(plugin)
-    print("Instalar primero local_reglasdeuda y luego availability_reglasdeuda.")
 
 
 if __name__ == "__main__":

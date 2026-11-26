@@ -34,7 +34,7 @@ $string['accion_bloquear'] = 'Block access to the site';
 $string['accion_help'] = 'What happens when the rule triggers:
 
 * **Block site**: after logging in the user sees the message and cannot navigate.
-* **Block resources**: activities with the "Debt rule" condition (Restrict access) are closed; optionally also every activity of selected types and categories (global block).
+* **Block resources**: when trying to enter the selected activities (by ID, or every activity of selected types, categories and courses) the user sees the message and a button back to the course.
 * **Only message**: full access; the notice is shown on the Dashboard and when entering each course.';
 $string['accion_restringir'] = 'Block resources';
 $string['activa'] = 'Enabled';
@@ -90,8 +90,8 @@ $string['estilo_danger'] = 'Danger (red)';
 $string['estilo_info'] = 'Information (blue)';
 $string['estilo_warning'] = 'Warning (yellow)';
 $string['global'] = 'global';
-$string['globalactivo'] = 'Global block';
-$string['globalactivo_help'] = 'Besides the activities where a teacher adds the condition, automatically block activities of the selected types and categories, without configuring them one by one. This block does not appear in the activity\'s "Restrict access"; the user sees the message when trying to enter.';
+$string['globalactivo'] = 'Also block by type, category or course';
+$string['globalactivo_help'] = 'Besides the activities by ID, block every activity matching the activity type, category and course filters (an empty filter = all). The activity is still listed in the course; the user sees the message when trying to enter.';
 $string['globalcategorias'] = 'Categories (including subcategories)';
 $string['globalcategorias_help'] = 'Empty = all categories.';
 $string['globalmodulos'] = 'Activity types';
@@ -181,3 +181,11 @@ $string['cachedef_resultados'] = 'API results per rule and user';
 $string['error_token'] = 'The token cannot contain line breaks.';
 $string['privacy:metadata:apiexterna:fullname'] = 'First and last name of the user.';
 $string['privacy:metadata:apiexterna:userid'] = 'Moodle user id.';
+$string['actividades'] = 'Activities (IDs)';
+$string['actividades_help'] = 'IDs of the activities to block, separated by commas. The ID is in the activity address: .../mod/quiz/view.php?id=42.';
+$string['error_actividades'] = 'Only numbers separated by commas.';
+$string['error_actividadesnoexisten'] = 'Some ID does not match an existing activity.';
+$string['error_sinalcance'] = 'Enter at least one activity or tick blocking by type, category or course.';
+$string['globalcursos'] = 'Courses';
+$string['globalcursos_help'] = 'Empty = all courses.';
+$string['nactividades'] = '{$a} activity(ies)';
