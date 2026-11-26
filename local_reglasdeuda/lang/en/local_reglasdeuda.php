@@ -248,3 +248,4 @@ $string['modal_help'] = 'Besides the box on the page, the message appears in a p
 $string['cm_excepciones'] = 'Can still do it';
 $string['cm_excepciones_help'] = 'Students who, even with debt, can submit or do this activity. They still see the message.';
 $string['ninguno'] = 'None';
+$string['accion_no_disponible'] = 'Not available: you have pending payments';

@@ -248,3 +248,4 @@ $string['modal_help'] = 'Ademas de la caja en la pagina, el mensaje aparece en u
 $string['cm_excepciones'] = 'Pueden realizarla igual';
 $string['cm_excepciones_help'] = 'Estudiantes que, aunque tengan deuda, pueden entregar o realizar esta actividad. Igual ven el mensaje.';
 $string['ninguno'] = 'Ninguno';
+$string['accion_no_disponible'] = 'No disponible: tiene valores pendientes';

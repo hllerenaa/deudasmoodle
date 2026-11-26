@@ -139,16 +139,21 @@ class aplicador {
             // Excepciones del docente: ven el mensaje, pero pueden realizar la actividad.
             $exceptuado = $config && (int)$config->reglaid === (int)$regla->id
                 && in_array((int)$USER->id, array_map('intval', reglas::csv($config->excepciones ?? '')), true);
-            $bloquear = !$exceptuado && ($modo === recursos::MODO_ENTRAR
-                || !in_array($modname, recursos::MODULOS_ENTREGA, true)
-                || recursos::es_accion_de_entrega($modname, (string)$SCRIPT));
-            if ($bloquear) {
+            $soloentrega = $modo === recursos::MODO_ENTREGAR && in_array($modname, recursos::MODULOS_ENTREGA, true);
+            if (!$exceptuado && !$soloentrega) {
+                // Toda la actividad: pagina de bloqueo con el mensaje.
                 self::cortar($sinredireccion, new \moodle_url('/local/reglasdeuda/bloqueado.php',
                     ['regla' => $regla->id, 'cmid' => $cm->id]));
             }
+            if (!$exceptuado && recursos::es_accion_de_entrega($modname, (string)$SCRIPT)) {
+                // Entrar directo a entregar/iniciar: vuelve a la actividad (alli ve el mensaje y los botones desactivados).
+                self::cortar($sinredireccion, new \moodle_url('/mod/' . $modname . '/view.php', ['id' => $cm->id]));
+            }
             if (!$sinredireccion && self::primera_vez('avisocm' . $cm->id)) {
-                // Puede ver la actividad, pero se le avisa que no podra entregar/iniciar.
-                self::$pendientes[] = mensaje::contexto($regla, $evaluacion, $USER, $contexto);
+                // Ve la actividad con el mensaje; si no esta exceptuado, los botones de entregar/iniciar se desactivan.
+                $c = mensaje::contexto($regla, $evaluacion, $USER, $contexto);
+                $c['desactivar'] = !$exceptuado;
+                self::$pendientes[] = $c;
             }
         }
     }

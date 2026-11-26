@@ -170,6 +170,9 @@ class mensaje {
                         'background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:1rem;']);
             }
         }
+        $desactivar = (bool)array_filter($avisos, function($c) {
+            return !empty($c['desactivar']);
+        });
         $html = \html_writer::div($cajas, 'local-reglasdeuda-avisos',
             ['id' => 'local-reglasdeuda-avisos', 'style' => 'margin: 1rem 0; position: relative; z-index: 1;']) . $modales;
         // Mueve la caja al inicio del contenido principal (Boost, Classic y temas de terceros) y muestra
@@ -185,7 +188,36 @@ class mensaje {
             "x.querySelector('.local-reglasdeuda-cerrar').addEventListener('click',c);" .
             "x.addEventListener('click',function(e){if(e.target===x){c();}});})(m[j]);}}" .
             "if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',mover);}else{mover();}})();";
+        if ($desactivar) {
+            $js .= self::js_desactivar(get_string('accion_no_disponible', 'local_reglasdeuda'));
+        }
         return $html . \html_writer::script($js);
+    }
+
+    /**
+     * Desactiva en la pagina de la actividad los botones y enlaces para entregar (tarea) o
+     * iniciar/continuar/revisar (cuestionario). El servidor ademas rechaza esas acciones.
+     *
+     * @param string $titulo texto al pasar el raton
+     * @return string
+     */
+    private static function js_desactivar(string $titulo): string {
+        return "(function(){var T=" . json_encode($titulo) . ";" .
+            "var rutas=['/mod/quiz/startattempt.php','/mod/quiz/attempt.php','/mod/quiz/summary.php','/mod/quiz/review.php'];" .
+            "var acciones=['editsubmission','submit','savesubmission','removesubmission'];" .
+            "function bloqueada(u){if(!u){return false;}for(var i=0;i<rutas.length;i++){if(u.indexOf(rutas[i])>=0){return true;}}" .
+            "for(var j=0;j<acciones.length;j++){if(u.indexOf('action='+acciones[j])>=0){return true;}}return false;}" .
+            "function apagar(el){el.setAttribute('aria-disabled','true');el.classList.add('disabled');el.title=T;" .
+            "el.style.pointerEvents='none';el.style.opacity='.5';if('disabled' in el){el.disabled=true;}}" .
+            "function aplicar(){var ls=document.querySelectorAll('a[href]');for(var i=0;i<ls.length;i++){" .
+            "if(bloqueada(ls[i].getAttribute('href'))){ls[i].removeAttribute('href');apagar(ls[i]);}}" .
+            "var fs=document.querySelectorAll('form');for(var k=0;k<fs.length;k++){var f=fs[k];" .
+            "var h=f.querySelector('input[name=\"action\"]');var v=h?h.value:'';" .
+            "if(bloqueada(f.getAttribute('action')||'')||acciones.indexOf(v)>=0){" .
+            "var bs=f.querySelectorAll('button,input[type=submit]');for(var b=0;b<bs.length;b++){apagar(bs[b]);}" .
+            "f.addEventListener('submit',function(e){e.preventDefault();});}}}" .
+            "if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',aplicar);}else{aplicar();}" .
+            "setTimeout(aplicar,1500);})();";
     }
 
     /**

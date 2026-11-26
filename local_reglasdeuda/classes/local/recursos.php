@@ -155,7 +155,7 @@ class recursos {
     public static function es_accion_de_entrega(string $modname, string $script): bool {
         if ($modname === 'quiz') {
             return in_array($script, ['/mod/quiz/startattempt.php', '/mod/quiz/attempt.php',
-                '/mod/quiz/processattempt.php', '/mod/quiz/summary.php'], true);
+                '/mod/quiz/processattempt.php', '/mod/quiz/summary.php', '/mod/quiz/review.php'], true);
         }
         if ($modname === 'assign') {
             $accion = optional_param('action', '', PARAM_ALPHA);
