@@ -227,6 +227,10 @@ class regla_form extends \moodleform {
             $errores['respuestaejemplo'] = get_string('error_json', $c);
         }
         foreach (['rutaresultado', 'rutadatos', 'rutamensaje'] as $campo) {
+            // Datos y mensaje pueden quedar vacios (no se usan); el resultado es obligatorio.
+            if ($campo !== 'rutaresultado' && $data[$campo] === '') {
+                continue;
+            }
             if (!preg_match('/^[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*$/', $data[$campo])) {
                 $errores[$campo] = get_string('error_ruta', $c);
             }

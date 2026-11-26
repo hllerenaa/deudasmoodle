@@ -118,6 +118,40 @@ class parametros {
     }
 
     /**
+     * Para POST JSON: los valores fijos "true"/"false" (cualquier mayuscula) van como booleanos y los
+     * numeros como numeros. Los campos de Moodle siguen siendo texto (una cedula "0912..." no pierde el 0).
+     *
+     * @param \stdClass $regla
+     * @param array $valores nombre => valor (texto)
+     * @return array nombre => valor tipado
+     */
+    public static function con_tipos(\stdClass $regla, array $valores): array {
+        foreach (self::de_regla($regla) as $p) {
+            if ($p['campo'] !== self::FIJO || !array_key_exists($p['nombre'], $valores)) {
+                continue;
+            }
+            $valores[$p['nombre']] = self::tipar($valores[$p['nombre']]);
+        }
+        return $valores;
+    }
+
+    /**
+     * @param string $valor
+     * @return bool|int|float|string
+     */
+    public static function tipar(string $valor) {
+        $minuscula = strtolower(trim($valor));
+        if ($minuscula === 'true' || $minuscula === 'false') {
+            return $minuscula === 'true';
+        }
+        // Numero sin ceros a la izquierda (0, 50, 0.00, -3.5); "007" sigue siendo texto.
+        if (preg_match('/^-?(0|[1-9]\d*)(\.\d+)?$/', trim($valor), $m)) {
+            return isset($m[2]) && $m[2] !== '' ? (float)$valor : (int)$valor;
+        }
+        return $valor;
+    }
+
+    /**
      * Nombre de parametro valido (sin espacios ni caracteres que rompan la URL o el JSON).
      *
      * @param string $nombre

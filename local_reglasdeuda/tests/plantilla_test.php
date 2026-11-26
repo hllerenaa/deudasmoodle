@@ -71,6 +71,15 @@ final class plantilla_test extends \advanced_testcase {
         ];
     }
 
+    public function test_tipar_valores_fijos(): void {
+        $this->assertSame(true, \local_reglasdeuda\local\parametros::tipar('TRUE'));
+        $this->assertSame(false, \local_reglasdeuda\local\parametros::tipar('false'));
+        $this->assertSame(50, \local_reglasdeuda\local\parametros::tipar('50'));
+        $this->assertSame(0.0, \local_reglasdeuda\local\parametros::tipar('0.00'));
+        $this->assertSame('0912345678', \local_reglasdeuda\local\parametros::tipar('0912345678'));
+        $this->assertSame('idnumber', \local_reglasdeuda\local\parametros::tipar('idnumber'));
+    }
+
     public function test_variables_de_ejemplo(): void {
         $ejemplo = '{"resultado": true, "datos": {"total": "1", "url_pago": "https://x", "det": {"a": 1}}}';
         $this->assertSame(['datos.total', 'datos.url_pago', 'datos.det.a'], plantilla::variables_de_ejemplo($ejemplo, 'datos'));

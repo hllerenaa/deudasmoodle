@@ -88,7 +88,10 @@ y `local/reglasdeuda:exento` (nunca se le aplican reglas; por defecto, Gestor).
   respuesta de ejemplo. Normalmente no hace falta tocarlos.
 
 Los valores se envían **exactamente como se escriben** (mayúsculas/minúsculas incluidas).
-Con POST JSON todos viajan como texto: `{"deuda_maxima": "50"}`.
+Con POST JSON, los **valores fijos** `true`/`false` viajan como booleanos y los números
+como números (`{"deuda_maxima": 0.0, "solo_vencido": true}`); los campos de Moodle
+siempre como texto (la cédula conserva el 0 inicial). Los campos de datos y de
+mensaje pueden quedar vacíos si no se usan.
 
 ### Acción
 | Acción | Qué ve el estudiante |

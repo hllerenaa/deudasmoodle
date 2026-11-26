@@ -51,8 +51,8 @@ class cliente_api {
                     'cuerpo' => http_build_query($valores, '', '&', PHP_QUERY_RFC3986)];
             default:
                 return ['metodo' => 'POST', 'url' => $regla->url, 'tipo' => 'application/json',
-                    'cuerpo' => json_encode((object)$valores, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES |
-                        JSON_INVALID_UTF8_SUBSTITUTE)];
+                    'cuerpo' => json_encode((object)parametros::con_tipos($regla, $valores), JSON_UNESCAPED_UNICODE |
+                        JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PRESERVE_ZERO_FRACTION)];
         }
     }
 
