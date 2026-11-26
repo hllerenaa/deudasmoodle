@@ -64,10 +64,15 @@ foreach ($todas as $regla) {
         if ($p['campo'] === parametros::FIJO) {
             $etiqueta .= ': ' . $p['valor'];
             $valores[$p['nombre']] = $p['valor'];
+        } else if ($p['valor'] !== '' && empty($ficticio->{$p['campo']})) {
+            $valores[$p['nombre']] = $p['valor'];
         } else if (strpos($p['campo'], parametros::PERFIL) === 0) {
             $valores[$p['nombre']] = '<' . substr($p['campo'], strlen(parametros::PERFIL)) . '>';
         } else {
             $valores[$p['nombre']] = (string)($ficticio->{$p['campo']} ?? '');
+        }
+        if ($p['campo'] !== parametros::FIJO && $p['valor'] !== '') {
+            $etiqueta .= ' ' . get_string('pordefecto', $c, $p['valor']);
         }
         $tabla->data[] = [html_writer::tag('code', s($p['nombre'])), s($etiqueta)];
     }

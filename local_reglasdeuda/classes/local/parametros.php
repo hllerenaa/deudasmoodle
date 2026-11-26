@@ -18,6 +18,7 @@ namespace local_reglasdeuda\local;
 
 /**
  * Parametros que una regla envia a su API: nombre del parametro => campo de Moodle (o valor fijo).
+ * Con campo y valor, el valor se usa por defecto cuando al usuario le falta el dato.
  *
  * Se guardan en la regla como JSON: [{"nombre": "cedula", "campo": "idnumber", "valor": ""}, ...].
  *
@@ -104,8 +105,12 @@ class parametros {
             } else {
                 $valor = '';
             }
-            if ($valor === '' && $p['campo'] !== self::FIJO && $faltante === null) {
-                $faltante = self::campos_disponibles()[$p['campo']] ?? $p['campo'];
+            if ($valor === '' && $p['campo'] !== self::FIJO) {
+                if ($p['valor'] !== '') {
+                    $valor = $p['valor']; // Valor por defecto cuando al usuario le falta el dato.
+                } else if ($faltante === null) {
+                    $faltante = self::campos_disponibles()[$p['campo']] ?? $p['campo'];
+                }
             }
             $valores[$p['nombre']] = $valor;
         }

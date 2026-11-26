@@ -63,13 +63,16 @@ y `local/reglasdeuda:exento` (nunca se le aplican reglas; por defecto, Gestor).
   | Nombre | ← Campo de Moodle |
   |---|---|
   | `cedula` | Número de ID |
-  | `correo` | Correo |
-  | `sistema` | Valor fijo: `MOODLE` |
+  | `deuda_maxima` | *(Elegir...)* con valor `50` → se envía siempre `50` |
+  | `correo` | Correo, con valor `sin-correo` → por defecto si el estudiante no tiene correo |
 
+  Cada fila admite: **solo campo** (el dato del estudiante), **solo valor** (se
+  envía siempre ese valor) o **campo y valor** (el valor se usa por defecto si al
+  estudiante le falta el dato).
   Campos disponibles: Número de ID, Nombre de usuario, Correo, Nombre, Apellido,
-  Id interno de Moodle, **cualquier campo de perfil personalizado** y *Valor fijo*.
-  Si a un estudiante le falta el dato (p. ej. no tiene número de ID), no se
-  consulta la API y se aplica la política de error.
+  Id interno de Moodle y **cualquier campo de perfil personalizado**.
+  Si a un estudiante le falta un dato sin valor por defecto, no se consulta la
+  API y se aplica la política de error.
 - **Autenticación**: ninguna, `Authorization: Bearer <token>` o una cabecera propia
   (p. ej. `X-API-Key`). **Tiempo máximo de espera** (5 s por defecto).
 

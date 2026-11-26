@@ -207,14 +207,11 @@ class regla_form extends \moodleform {
             } else if (isset($vistos[$p['nombre']])) {
                 $errores[$clave] = get_string('error_param_repetido', $c);
             } else if ($p['campo'] === '') {
-                $errores[$clave] = get_string('required');
+                $errores[$clave] = get_string('error_param_sinvalor', $c);
             }
             $vistos[$p['nombre']] = true;
         }
-        $conmoodle = array_filter(self::parametros_enviados($data), function($p) {
-            return $p['campo'] !== '' && $p['campo'] !== parametros::FIJO;
-        });
-        if (!$conmoodle) {
+        if (!self::parametros_enviados($data)) {
             $errores['param_grupo[0]'] = get_string('error_sinparametros', $c);
         }
         if (trim($data['respuestaejemplo']) !== '' && !is_array(json_decode($data['respuestaejemplo'], true))) {
@@ -265,11 +262,11 @@ class regla_form extends \moodleform {
                 continue;
             }
             $campo = (string)($data['param_campo'][$i] ?? '');
-            $filas[$i] = [
-                'nombre' => $nombre,
-                'campo' => $campo,
-                'valor' => $campo === parametros::FIJO ? trim((string)($data['param_valor'][$i] ?? '')) : '',
-            ];
+            $valor = trim((string)($data['param_valor'][$i] ?? ''));
+            if ($campo === '' && $valor !== '') {
+                $campo = parametros::FIJO; // Solo se escribio un valor: se envia tal cual.
+            }
+            $filas[$i] = ['nombre' => $nombre, 'campo' => $campo, 'valor' => $valor];
         }
         return $filas;
     }
