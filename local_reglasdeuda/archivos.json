@@ -8,7 +8,7 @@
  "classes/local/archivos.php": "d7a731a2aa7a18ec581f1fa11c5aa3458b7c0b28",
  "classes/local/cliente_api.php": "8eafe58d736adcc2541ec2a825601fde4139fc8f",
  "classes/local/evaluador.php": "e438296662c4ba0e386886c297cb196af664baed",
- "classes/local/mensaje.php": "aa180ab107c09d5e188b11b30ba114f0d496cb46",
+ "classes/local/mensaje.php": "a2a765d6f208e450af3ed026f4d7fa4716fca1b6",
  "classes/local/parametros.php": "bc8adc73a7ad7c9a10a1009f000afe1a8bafd3de",
  "classes/local/pestanas.php": "be499f487042a1b0eb931e9e5acd72b41cf07212",
  "classes/local/plantilla.php": "dd33dd27c2d0cdfd838a27514f40f48fc489037b",
@@ -34,5 +34,5 @@
  "settings.php": "c117a4517abdd94cb80d241b63ce377f033d9f70",
  "tests/plantilla_test.php": "c64a011c063570e8d698c6d178c56d16f99718b1",
  "verificar.php": "95a10d5a5c80e33dbb1d3457e268f02a34d68ade",
- "version.php": "b05356e5f716298f07004f339bf0da08b5289330"
+ "version.php": "b257555a746c956b2e707b5d9ed46e340d477393"
 }

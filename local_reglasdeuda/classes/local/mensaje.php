@@ -24,6 +24,14 @@ namespace local_reglasdeuda\local;
  */
 class mensaje {
 
+    /** Boton de pago: azul con texto blanco, igual en cualquier tema y dentro de cualquier .alert. */
+    const ESTILO_BOTON_PAGO = 'color:#fff !important;background-color:#0f6cbf;border-color:#0f6cbf;' .
+        'text-decoration:none !important;font-weight:600;';
+
+    /** Boton "Ya pague": blanco con borde gris. */
+    const ESTILO_BOTON_VERIFICAR = 'color:#343a40 !important;background-color:#fff;border:1px solid #adb5bd;' .
+        'text-decoration:none !important;';
+
     /** Estilo de la regla => tipo de \core\notification. */
     const NOTIFICACION = [
         'info' => \core\output\notification::NOTIFY_INFO,
@@ -50,6 +58,9 @@ class mensaje {
         if ($evaluacion['mensajeapi'] !== '') {
             // El mensaje de la API es texto plano: se escapa completo.
             $cuerpo = nl2br(s($evaluacion['mensajeapi']));
+            // Enlaces http(s) del texto de la API, clicables (ya escapados; solo se envuelven).
+            $cuerpo = preg_replace('~(https?://[^\s<]+[^\s<.,;:)])~i',
+                '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>', $cuerpo);
         } else {
             // Los valores se escapan antes de insertarse en el HTML del admin; luego se limpia el conjunto.
             $html = plantilla::reemplazar((string)$regla->mensaje, $variables, 's');
@@ -117,7 +128,8 @@ class mensaje {
         $partes .= \html_writer::div($c['cuerpo'], 'local-reglasdeuda-cuerpo');
         $botones = '';
         if ($c['botonurl'] !== '' && $c['botontexto'] !== '') {
-            $atributos = ['class' => 'btn btn-primary mt-2 me-2 mr-2'];
+            // Colores fijos: dentro de .alert el tema tine los enlaces (y los botones son enlaces).
+            $atributos = ['class' => 'btn btn-primary mt-2 me-2 mr-2', 'style' => self::ESTILO_BOTON_PAGO];
             if ($c['nuevapestana']) {
                 $atributos += ['target' => '_blank', 'rel' => 'noopener noreferrer'];
             }
@@ -125,7 +137,7 @@ class mensaje {
         }
         if ($c['verificarurl'] !== '') {
             $botones .= \html_writer::link($c['verificarurl'], get_string('verificar', 'local_reglasdeuda'),
-                ['class' => 'btn btn-secondary mt-2']);
+                ['class' => 'btn mt-2', 'style' => self::ESTILO_BOTON_VERIFICAR]);
         }
         if ($botones !== '') {
             $partes .= \html_writer::div($botones, 'local-reglasdeuda-botones');
