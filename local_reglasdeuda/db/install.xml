@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/reglasdeuda/db" VERSION="20261126" COMMENT="Reglas por API externa"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="local_reglasdeuda_reglas" COMMENT="Cada regla consulta una API y aplica una accion">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="nombre" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="activa" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="orden" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="url" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="autenticacion" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="bearer" SEQUENCE="false" COMMENT="ninguna, bearer o cabecera"/>
+        <FIELD NAME="cabeceranombre" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="token" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timeout" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="5" SEQUENCE="false"/>
+        <FIELD NAME="identificador" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="idnumber" SEQUENCE="false" COMMENT="username, idnumber o email"/>
+        <FIELD NAME="plantilla" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON enviado a la API"/>
+        <FIELD NAME="rutaresultado" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="resultado" SEQUENCE="false"/>
+        <FIELD NAME="rutadatos" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="datos" SEQUENCE="false"/>
+        <FIELD NAME="rutamensaje" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="mensaje" SEQUENCE="false"/>
+        <FIELD NAME="valoractiva" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="1: actua si la API responde true; 0: si responde false"/>
+        <FIELD NAME="errorpolitica" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="permitir" SEQUENCE="false" COMMENT="permitir o aplicar"/>
+        <FIELD NAME="cachettl" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="900" SEQUENCE="false"/>
+        <FIELD NAME="accion" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="avisar" SEQUENCE="false" COMMENT="bloquear, restringir o avisar"/>
+        <FIELD NAME="globalactivo" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="globalmodulos" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de modname; vacio = todos"/>
+        <FIELD NAME="globalcategorias" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de ids de categoria; vacio = todas"/>
+        <FIELD NAME="rolesexentos" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de ids de rol"/>
+        <FIELD NAME="titulo" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="mensaje" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="mensajeformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="botontexto" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="botonurl" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="botonurlrespaldo" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="nuevapestana" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="estilo" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="warning" SEQUENCE="false" COMMENT="info, warning o danger"/>
+        <FIELD NAME="respuestaejemplo" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON de ejemplo para descubrir variables"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="activa" UNIQUE="false" FIELDS="activa"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>
