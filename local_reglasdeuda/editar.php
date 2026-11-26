@@ -27,6 +27,8 @@ use local_reglasdeuda\local\pestanas;
 use local_reglasdeuda\local\reglas;
 
 require_once(__DIR__ . '/../../config.php');
+// Carga explicita: no depende del mapa de clases en cache de Moodle ("Class not found" tras actualizar).
+require_once(__DIR__ . '/classes/form/regla_form.php');
 
 $id = optional_param('id', 0, PARAM_INT);
 
@@ -45,7 +47,7 @@ $datos = clone $regla;
 $datos->globalmodulos = reglas::csv($regla->globalmodulos);
 $datos->globalcategorias = reglas::csv($regla->globalcategorias);
 $datos->globalcursos = reglas::csv($regla->globalcursos);
-$datos->rolesexentos = reglas::csv($regla->rolesexentos);
+$datos->rolesaplica = reglas::csv($regla->rolesaplica);
 $datos->mensaje_editor = ['text' => (string)$regla->mensaje, 'format' => (int)$regla->mensajeformat];
 $lista = parametros::de_regla($regla);
 foreach ($lista as $i => $p) {
@@ -74,7 +76,7 @@ if ($enviado = $form->get_data()) {
     $guardar->globalcategorias = implode(',', array_map('intval', $enviado->globalcategorias ?? []));
     $guardar->globalcursos = implode(',', array_map('intval', (array)($enviado->globalcursos ?? [])));
     $guardar->actividades = implode(',', array_unique(array_map('intval', reglas::csv($enviado->actividades ?? ''))));
-    $guardar->rolesexentos = implode(',', array_map('intval', $enviado->rolesexentos ?? []));
+    $guardar->rolesaplica = implode(',', array_map('intval', $enviado->rolesaplica ?? []));
     $guardar->mensaje = $enviado->mensaje_editor['text'];
     $guardar->mensajeformat = (int)$enviado->mensaje_editor['format'];
     if ($guardar->accion !== reglas::ACCION_RESTRINGIR) {

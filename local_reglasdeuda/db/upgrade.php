@@ -69,5 +69,24 @@ function xmldb_local_reglasdeuda_upgrade($oldversion) {
         }
         upgrade_plugin_savepoint(true, 2026112601, 'local', 'reglasdeuda');
     }
+
+    if ($oldversion < 2026112603) {
+        // "Roles exentos" pasa a "Roles a los que aplica": las reglas existentes quedan con Estudiante.
+        $tabla = new xmldb_table('local_reglasdeuda_reglas');
+        $nuevo = new xmldb_field('rolesaplica', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        if (!$dbman->field_exists($tabla, $nuevo)) {
+            $dbman->add_field($tabla, $nuevo);
+            $estudiante = implode(',', array_map(function($rol) {
+                return (int)$rol->id;
+            }, get_archetype_roles('student')));
+            $DB->set_field('local_reglasdeuda_reglas', 'rolesaplica', $estudiante);
+        }
+        $viejo = new xmldb_field('rolesexentos');
+        if ($dbman->field_exists($tabla, $viejo)) {
+            $dbman->drop_field($tabla, $viejo);
+        }
+        \cache::make('local_reglasdeuda', 'reglas')->purge();
+        upgrade_plugin_savepoint(true, 2026112603, 'local', 'reglasdeuda');
+    }
     return true;
 }

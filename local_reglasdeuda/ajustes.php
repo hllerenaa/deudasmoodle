@@ -25,6 +25,8 @@ use local_reglasdeuda\form\ajustes_form;
 use local_reglasdeuda\local\pestanas;
 
 require_once(__DIR__ . '/../../config.php');
+// Carga explicita: no depende del mapa de clases en cache de Moodle ("Class not found" tras actualizar).
+require_once(__DIR__ . '/classes/form/ajustes_form.php');
 
 $url = new moodle_url('/local/reglasdeuda/ajustes.php');
 pestanas::configurar_pagina($url, get_string('ajustesgenerales', 'local_reglasdeuda'));

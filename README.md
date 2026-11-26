@@ -76,17 +76,19 @@ y `local/reglasdeuda:exento` (nunca se le aplican reglas; por defecto, Gestor).
 - **Autenticación**: ninguna, `Authorization: Bearer <token>` o una cabecera propia
   (p. ej. `X-API-Key`). **Tiempo máximo de espera** (5 s por defecto).
 
-### Respuesta: cómo se interpreta
-- **Campo de resultado** (por defecto `resultado`): el valor `true`/`false` que decide.
-  Admite rutas con puntos (`respuesta.tiene_deuda`) y también 1/0 o "si"/"no".
-- **La regla se activa cuando la API responde**: `true` o `false`. Así la API no
-  tiene que adaptarse: si responde "tiene_deuda", elija true; si responde
-  "al_dia", elija false.
-- **Campo de datos** (por defecto `datos`) y **campo de mensaje** (por defecto `mensaje`).
-- **Si la API falla**: *dejar pasar* (recomendado) o *aplicar la acción*.
-- **Recordar la respuesta durante**: de 1 minuto a 1 día (15 min por defecto).
-  Los errores se recuerdan 30 segundos.
-- **Respuesta de ejemplo**: sus campos aparecen como variables en el mensaje (ver Probar).
+### Respuesta: cómo se lee (paso 2)
+- **Campo que dice si tiene deuda** (por defecto `resultado`): si la API responde
+  `{"resultado": true}`, deje `resultado`; si responde `{"tiene_deuda": true}`,
+  escriba `tiene_deuda`. Acepta true/false, 1/0 y "si"/"no" (en mayúsculas o minúsculas).
+- **Actuar cuando ese campo sea**: casi siempre *true*. Elija *false* solo si la API
+  responde al revés (p. ej. `{"al_dia": false}` cuando debe).
+- **Si la API no responde**: *dejar pasar al estudiante* (recomendado) o *aplicar la acción igual*.
+- **Volver a consultar cada**: de 1 minuto a 1 día (15 min por defecto).
+- En *Mostrar más...*: campo de datos (`datos`), campo de mensaje (`mensaje`) y
+  respuesta de ejemplo. Normalmente no hace falta tocarlos.
+
+Los valores se envían **exactamente como se escriben** (mayúsculas/minúsculas incluidas).
+Con POST JSON todos viajan como texto: `{"deuda_maxima": "50"}`.
 
 ### Acción
 | Acción | Qué ve el estudiante |
@@ -101,8 +103,10 @@ Para **Bloquear recursos** se eligen:
 - y/o **Bloquear también por tipo, categoría o curso**: p. ej. todos los
   *Cuestionarios* de la categoría *Pregrado* (un filtro vacío = todos).
 
-**Roles exentos**: en reglas nuevas vienen marcados *Profesor* y *Profesor sin
-permiso de edición*. Los administradores siempre están exentos.
+**Roles a los que aplica**: en reglas nuevas viene marcado *Estudiante*; la regla
+solo afecta a quien tenga alguno de esos roles en cualquier curso. Vacío = aplica
+a todos. Los administradores y quien tenga `local/reglasdeuda:exento` nunca
+quedan afectados.
 
 ### Mensaje
 - **Título**, **Mensaje** (editor con formato), **Texto del botón**, **Enlace del
@@ -159,8 +163,9 @@ ejemplo de la petición. La API debe responder con HTTP 200 y JSON:
 Estudiante abre una página
         │
         ▼
- ¿Está exento? (admin, Gestor, rol exento) ──sí──► sigue normal
-        │ no
+ ¿Tiene un rol al que aplica la regla? ──no──► sigue normal
+ (admin y Gestor nunca)
+        │ sí
         ▼
  ¿Hay respuesta guardada y vigente? ──no──► consulta la API (con los parámetros de la regla)
         │                                         y guarda la respuesta (15 min por defecto)
@@ -194,7 +199,7 @@ Estudiante abre una página
 |---|---|
 | `Class "local_reglasdeuda\...\" not found` tras copiar archivos nuevos | Subir de versión (`py build.py --bump`) y reinstalar el ZIP, o *Administración › Desarrollo › Purgar todas las cachés* |
 | Probar dice que la URL está bloqueada | Activar *Permitir APIs en la red interna* (pestaña Ajustes) |
-| Probar funciona pero al estudiante no le aparece nada | Revisar: regla **Activa**, *Aplicar reglas* encendido, que el estudiante no tenga un rol exento, y esperar a que venza la respuesta guardada (o usar "Ya pagué, volver a verificar") |
+| Probar funciona pero al estudiante no le aparece nada | Revisar: regla **Activa**, *Aplicar reglas* encendido, que el estudiante tenga uno de los *Roles a los que aplica*, y esperar a que venza la respuesta guardada (o usar "Ya pagué, volver a verificar") |
 | "El usuario no tiene ..." | Al estudiante le falta el campo que se envía (p. ej. número de ID) |
 | Las actividades por ID dejaron de bloquearse tras duplicar/restaurar un curso | Las copias tienen IDs nuevos: agréguelos o use el filtro por curso/categoría |
 

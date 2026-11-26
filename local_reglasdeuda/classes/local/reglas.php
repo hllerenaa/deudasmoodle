@@ -66,7 +66,7 @@ class reglas {
             'globalmodulos' => '',
             'globalcategorias' => '',
             'globalcursos' => '',
-            'rolesexentos' => self::roles_docentes(),
+            'rolesaplica' => self::roles_estudiante(),
             'titulo' => '',
             'mensaje' => '',
             'mensajeformat' => FORMAT_HTML,
@@ -165,18 +165,14 @@ class reglas {
     }
 
     /**
-     * Ids (CSV) de los roles de arquetipo profesor, exentos por defecto en reglas nuevas.
+     * Ids (CSV) de los roles de arquetipo estudiante: a quienes aplica por defecto una regla nueva.
      *
      * @return string
      */
-    public static function roles_docentes(): string {
-        $ids = [];
-        foreach (['editingteacher', 'teacher'] as $arquetipo) {
-            foreach (get_archetype_roles($arquetipo) as $rol) {
-                $ids[] = (int)$rol->id;
-            }
-        }
-        return implode(',', array_unique($ids));
+    public static function roles_estudiante(): string {
+        return implode(',', array_map(function($rol) {
+            return (int)$rol->id;
+        }, get_archetype_roles('student')));
     }
 
     /**

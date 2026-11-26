@@ -63,7 +63,7 @@ class regla_form extends \moodleform {
         $f->addHelpButton('orden', 'orden', $c);
 
         // API.
-        $f->addElement('header', 'h_api', get_string('api', $c));
+        $f->addElement('header', 'h_api', get_string('paso_api', $c));
         $f->setExpanded('h_api');
         $f->addElement('text', 'url', get_string('url', $c), ['size' => 70]);
         $f->setType('url', PARAM_RAW_TRIMMED);
@@ -100,21 +100,21 @@ class regla_form extends \moodleform {
         $f->hideIf('token', 'autenticacion', 'eq', 'ninguna');
         $f->addElement('text', 'timeout', get_string('timeout', $c), ['size' => 4]);
         $f->setType('timeout', PARAM_INT);
+        $f->setAdvanced('timeout');
 
-        // Respuesta.
-        $f->addElement('header', 'h_respuesta', get_string('respuesta', $c));
-        $f->addElement('text', 'rutaresultado', get_string('rutaresultado', $c), ['size' => 30]);
+        // Respuesta: a la vista solo lo esencial; el resto en "Mostrar mas..." con valores por defecto.
+        $f->addElement('header', 'h_respuesta', get_string('paso_respuesta', $c));
+        $f->setExpanded('h_respuesta');
+        $f->addElement('static', 'respuesta_ejemplo', get_string('respuesta_esperada', $c),
+            \html_writer::tag('code', s('{"resultado": true, "datos": {"total": "235.50", "url_pago": "https://..."}}')));
+        $f->addElement('text', 'rutaresultado', get_string('rutaresultado', $c), ['size' => 20]);
         $f->setType('rutaresultado', PARAM_RAW_TRIMMED);
         $f->addHelpButton('rutaresultado', 'rutaresultado', $c);
-        $f->addElement('select', 'valoractiva', get_string('valoractiva', $c), [
-            1 => get_string('valoractiva_true', $c),
-            0 => get_string('valoractiva_false', $c),
-        ]);
-        $f->addHelpButton('valoractiva', 'valoractiva', $c);
-        $f->addElement('text', 'rutadatos', get_string('rutadatos', $c), ['size' => 30]);
-        $f->setType('rutadatos', PARAM_RAW_TRIMMED);
-        $f->addElement('text', 'rutamensaje', get_string('rutamensaje', $c), ['size' => 30]);
-        $f->setType('rutamensaje', PARAM_RAW_TRIMMED);
+        $f->addGroup([
+            $f->createElement('radio', 'valoractiva', '', get_string('valoractiva_true', $c), 1),
+            $f->createElement('radio', 'valoractiva', '', get_string('valoractiva_false', $c), 0),
+        ], 'g_valoractiva', get_string('valoractiva', $c), ' ', false);
+        $f->addHelpButton('g_valoractiva', 'valoractiva', $c);
         $f->addElement('select', 'errorpolitica', get_string('errorpolitica', $c), [
             'permitir' => get_string('errorpolitica_permitir', $c),
             'aplicar' => get_string('errorpolitica_aplicar', $c),
@@ -122,13 +122,22 @@ class regla_form extends \moodleform {
         $f->addHelpButton('errorpolitica', 'errorpolitica', $c);
         $f->addElement('duration', 'cachettl', get_string('cachettl', $c), ['optional' => false, 'defaultunit' => MINSECS]);
         $f->addHelpButton('cachettl', 'cachettl', $c);
+        $f->addElement('text', 'rutadatos', get_string('rutadatos', $c), ['size' => 20]);
+        $f->setType('rutadatos', PARAM_RAW_TRIMMED);
+        $f->addHelpButton('rutadatos', 'rutadatos', $c);
+        $f->setAdvanced('rutadatos');
+        $f->addElement('text', 'rutamensaje', get_string('rutamensaje', $c), ['size' => 20]);
+        $f->setType('rutamensaje', PARAM_RAW_TRIMMED);
+        $f->addHelpButton('rutamensaje', 'rutamensaje', $c);
+        $f->setAdvanced('rutamensaje');
         $f->addElement('textarea', 'respuestaejemplo', get_string('respuestaejemplo', $c),
             ['rows' => 8, 'cols' => 70, 'class' => 'text-monospace font-monospace']);
         $f->setType('respuestaejemplo', PARAM_RAW);
         $f->addHelpButton('respuestaejemplo', 'respuestaejemplo', $c);
+        $f->setAdvanced('respuestaejemplo');
 
         // Accion.
-        $f->addElement('header', 'h_accion', get_string('accion', $c));
+        $f->addElement('header', 'h_accion', get_string('paso_accion', $c));
         $f->setExpanded('h_accion');
         $f->addElement('select', 'accion', get_string('accion', $c), reglas::opciones_accion());
         $f->addHelpButton('accion', 'accion', $c);
@@ -153,12 +162,12 @@ class regla_form extends \moodleform {
         $f->addHelpButton('globalcursos', 'globalcursos', $c);
         $f->hideIf('globalcursos', 'accion', 'neq', reglas::ACCION_RESTRINGIR);
         $f->hideIf('globalcursos', 'globalactivo', 'notchecked');
-        $f->addElement('autocomplete', 'rolesexentos', get_string('rolesexentos', $c), self::roles(),
-            ['multiple' => true, 'noselectionstring' => get_string('ninguno', $c)]);
-        $f->addHelpButton('rolesexentos', 'rolesexentos', $c);
+        $f->addElement('autocomplete', 'rolesaplica', get_string('rolesaplica', $c), self::roles(),
+            ['multiple' => true, 'noselectionstring' => get_string('todos', $c)]);
+        $f->addHelpButton('rolesaplica', 'rolesaplica', $c);
 
         // Mensaje.
-        $f->addElement('header', 'h_mensaje', get_string('mensaje', $c));
+        $f->addElement('header', 'h_mensaje', get_string('paso_mensaje', $c));
         $f->setExpanded('h_mensaje');
         $f->addElement('static', 'variables', get_string('variables', $c),
             \html_writer::div('', 'local-reglasdeuda-variables',

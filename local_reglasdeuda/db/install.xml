@@ -29,7 +29,7 @@
         <FIELD NAME="globalmodulos" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de modname; vacio = todos"/>
         <FIELD NAME="globalcategorias" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de ids de categoria; vacio = todas"/>
         <FIELD NAME="globalcursos" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de ids de curso; vacio = todos"/>
-        <FIELD NAME="rolesexentos" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de ids de rol"/>
+        <FIELD NAME="rolesaplica" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de ids de rol a los que aplica; vacio = todos"/>
         <FIELD NAME="titulo" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="mensaje" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="mensajeformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>

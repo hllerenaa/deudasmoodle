@@ -28,6 +28,8 @@ use local_reglasdeuda\local\pestanas;
 use local_reglasdeuda\local\reglas;
 
 require_once(__DIR__ . '/../../config.php');
+// Carga explicita: no depende del mapa de clases en cache de Moodle ("Class not found" tras actualizar).
+require_once(__DIR__ . '/classes/form/probar_form.php');
 
 $id = required_param('id', PARAM_INT);
 

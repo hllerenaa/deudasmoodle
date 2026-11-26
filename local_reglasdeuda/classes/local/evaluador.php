@@ -31,7 +31,8 @@ class evaluador {
     private static $memo = ['ev' => [], 'exento' => []];
 
     /**
-     * El usuario nunca queda afectado por la regla: admin, capacidad de exento o rol exento.
+     * El usuario no queda afectado por la regla: es admin, tiene la capacidad de exento o no tiene
+     * ninguno de los roles a los que aplica la regla (vacio = aplica a todos).
      *
      * @param \stdClass $regla
      * @param int $userid
@@ -45,11 +46,11 @@ class evaluador {
         }
         $exento = is_siteadmin($userid)
             || has_capability('local/reglasdeuda:exento', \context_system::instance(), $userid);
-        $roles = array_map('intval', reglas::csv($regla->rolesexentos));
+        $roles = array_map('intval', reglas::csv($regla->rolesaplica));
         if (!$exento && $roles) {
             [$insql, $params] = $DB->get_in_or_equal($roles, SQL_PARAMS_NAMED);
             $params['userid'] = $userid;
-            $exento = $DB->record_exists_select('role_assignments', "userid = :userid AND roleid $insql", $params);
+            $exento = !$DB->record_exists_select('role_assignments', "userid = :userid AND roleid $insql", $params);
         }
         return self::$memo['exento'][$clave] = $exento;
     }
