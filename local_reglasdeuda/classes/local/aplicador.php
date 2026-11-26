@@ -51,6 +51,16 @@ class aplicador {
     /** @var array claves ya procesadas en esta peticion (require_login puede llamarse varias veces). */
     private static $hecho = [];
 
+    /** @var bool mostrar los avisos en cualquier pagina (pagina de Diagnostico) */
+    public static $forzar = false;
+
+    /**
+     * Olvida lo ya procesado en esta peticion (Diagnostico genera el aviso dos veces).
+     */
+    public static function reiniciar(): void {
+        self::$hecho = [];
+    }
+
     /** @var string[] avisos pendientes de mostrar en esta pagina (p.ej. el de una actividad bloqueada). */
     private static $pendientes = [];
 
@@ -162,7 +172,7 @@ class aplicador {
         }
         $avisos = self::$pendientes;
         self::$pendientes = [];
-        if (in_array($SCRIPT, self::SCRIPTS_AVISO, true) && self::primera_vez('avisar')) {
+        if ((self::$forzar || in_array($SCRIPT, self::SCRIPTS_AVISO, true)) && self::primera_vez('avisar')) {
             $curso = ($PAGE->course && $PAGE->course->id != SITEID) ? $PAGE->course : null;
             $contexto = ['curso' => $curso, 'cmid' => null];
             foreach (reglas::activas_por_accion(reglas::ACCION_AVISAR) as $regla) {

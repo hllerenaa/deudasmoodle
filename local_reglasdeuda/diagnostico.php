@@ -31,7 +31,18 @@ use local_reglasdeuda\local\reglas;
 require_once(__DIR__ . '/../../config.php');
 
 $url = new moodle_url('/local/reglasdeuda/diagnostico.php');
-pestanas::configurar_pagina($url, get_string('diagnostico', 'local_reglasdeuda'));
+// Cualquier usuario identificado puede ver su propio diagnostico (sin tokens ni datos de otros).
+require_login(null, false);
+$admin = has_capability('local/reglasdeuda:gestionar', context_system::instance());
+if ($admin) {
+    pestanas::configurar_pagina($url, get_string('diagnostico', 'local_reglasdeuda'));
+} else {
+    $PAGE->set_context(context_system::instance());
+    $PAGE->set_url($url);
+    $PAGE->set_pagelayout('standard');
+    $PAGE->set_title(get_string('diagnostico', 'local_reglasdeuda'));
+    $PAGE->set_heading(get_string('diagnostico', 'local_reglasdeuda'));
+}
 
 $filas = [];
 $paso = function(string $que, bool $ok, string $detalle = '') use (&$filas) {
@@ -62,7 +73,32 @@ if (class_exists('\core\hook\manager') && method_exists('\core\hook\manager', 'g
     $hookdetalle = 'Moodle sin hooks: callback de lib.php';
 }
 $paso('Gancho de avisos registrado (inicio del body)', $hookok, $hookdetalle);
-$paso('Tema', true, s($PAGE->theme->name) . ' (el aviso se inserta al inicio del contenido; no depende del tema)');
+// El aviso se inserta en standard_top_of_body_html(); un tema que la reemplace sin llamar al padre lo pierde.
+// $OUTPUT aun no esta inicializado aqui (es un "bootstrap_renderer"): se usa el renderer real de la pagina.
+$renderer = $PAGE->get_renderer('core');
+$declarada = (new ReflectionMethod($renderer, 'standard_top_of_body_html'))->getDeclaringClass()->getName();
+$temapropio = !in_array($declarada, ['core_renderer', 'renderer_base', 'core\\output\\core_renderer',
+    'core\\output\\renderer_base'], true);
+$paso('Tema', true, s($PAGE->theme->name) . ' · renderer: ' . s(get_class($renderer)) .
+    ($temapropio ? ' · ATENCION: el tema reemplaza standard_top_of_body_html() en ' . s($declarada) : ''));
+
+// Prueba real del gancho: genera el aviso como en el Area personal y muestra cualquier error.
+\local_reglasdeuda\local\aplicador::$forzar = true;
+try {
+    if (class_exists('\\core\\hook\\output\\before_standard_top_of_body_html_generation')) {
+        $hook = new \core\hook\output\before_standard_top_of_body_html_generation($renderer, '');
+        \core\di::get(\core\hook\manager::class)->dispatch($hook);
+        $salida = $hook->get_output();
+    } else {
+        $salida = local_reglasdeuda_before_standard_top_of_body_html();
+    }
+    $paso('Prueba del gancho: genera el aviso', strpos($salida, 'local-reglasdeuda-avisos') !== false,
+        strpos($salida, 'local-reglasdeuda-avisos') !== false ? 'el aviso se genera' : 'no genero aviso (ver pasos de la regla)');
+} catch (\Throwable $e) {
+    $paso('Prueba del gancho: genera el aviso', false, s(get_class($e) . ': ' . $e->getMessage() . ' @ ' .
+        basename($e->getFile()) . ':' . $e->getLine()));
+}
+\local_reglasdeuda\local\aplicador::reiniciar();
 
 $avisos = reglas::activas_por_accion(reglas::ACCION_AVISAR);
 $paso('Reglas activas "Solo mostrar mensaje"', (bool)$avisos, count($avisos) . ' regla(s)');
@@ -88,7 +124,9 @@ foreach ($avisos as $regla) {
 }
 
 echo $OUTPUT->header();
-echo pestanas::html('diagnostico');
+if ($admin) {
+    echo pestanas::html('diagnostico');
+}
 echo $OUTPUT->heading(get_string('diagnostico', 'local_reglasdeuda'), 3);
 echo html_writer::div(get_string('diagnostico_desc', 'local_reglasdeuda'), 'mb-3');
 $tabla = new html_table();

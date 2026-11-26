@@ -4,7 +4,7 @@
  "amd/src/variables.js": "acaf6025d8a49581f02bf0d6b2e0785a669ffc2a",
  "bloqueado.php": "2358c2ca7d2464f9fc3a14f0ec0176baedbbbfbd",
  "classes/hook_callbacks.php": "9c7a6c774505d3a59faf03846e8afb037762172d",
- "classes/local/aplicador.php": "55b1589996474b52a63b38a138363793eb9321e2",
+ "classes/local/aplicador.php": "37bba2345fe6fc76f197ea68aaba5de89e75765c",
  "classes/local/archivos.php": "d7a731a2aa7a18ec581f1fa11c5aa3458b7c0b28",
  "classes/local/cliente_api.php": "8eafe58d736adcc2541ec2a825601fde4139fc8f",
  "classes/local/evaluador.php": "e438296662c4ba0e386886c297cb196af664baed",
@@ -24,7 +24,7 @@
  "db/install.php": "e73ee21d9dfe31257978becb5c81ea5f5591231f",
  "db/install.xml": "e8d8222d1b9e179a5576d2ee39ea2f2f6d4764a8",
  "db/upgrade.php": "895c4833a0b8c1c30f1c7a910bbc61784e4c59ba",
- "diagnostico.php": "b45e0ecf13c801e42b0710e804d52c14caa81c56",
+ "diagnostico.php": "39d02d84c1e4bfc27cdea7a501d39fcd1eb32525",
  "editar.php": "f6da22cc2993f300bda3af135dbbecdc114b86a6",
  "index.php": "d527a282025955cdfc43a49f38a12e3fe0410add",
  "lang/en/local_reglasdeuda.php": "b4ae1f2584fc4e8f412da2aa09a13d7cf4bba03a",
@@ -34,5 +34,5 @@
  "settings.php": "c117a4517abdd94cb80d241b63ce377f033d9f70",
  "tests/plantilla_test.php": "c64a011c063570e8d698c6d178c56d16f99718b1",
  "verificar.php": "95a10d5a5c80e33dbb1d3457e268f02a34d68ade",
- "version.php": "3e09719f2cfa345014228b2f608fb448d34a9bb1"
+ "version.php": "39b469471e933433266e8575357691a90543a616"
 }
