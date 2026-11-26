@@ -33,9 +33,9 @@ $string['accion_avisar'] = 'Only show a message (Dashboard and courses)';
 $string['accion_bloquear'] = 'Block access to the site';
 $string['accion_help'] = 'What happens when the rule triggers:
 
-* **Block site**: after logging in the user sees the message and cannot navigate.
-* **Block resources**: when trying to enter the selected activities (by ID, or every activity of selected types, categories and courses) the user sees the message and a button back to the course.
-* **Only message**: full access; the notice is shown on the Dashboard and when entering each course.';
+* **Only show a message**: notice on Home, Dashboard, My courses and courses.
+* **Block site**: the user sees the message and cannot navigate (not applied to administrators or teachers).
+* **None**: only used to block resources (see "Allow blocking resources").';
 $string['accion_restringir'] = 'Block resources';
 $string['activa'] = 'Enabled';
 $string['activar'] = 'Enable';
@@ -170,7 +170,7 @@ $string['cachedef_resultados'] = 'API results per rule and user';
 $string['error_token'] = 'The token cannot contain line breaks.';
 $string['privacy:metadata:apiexterna:fullname'] = 'First and last name of the user.';
 $string['privacy:metadata:apiexterna:userid'] = 'Moodle user id.';
-$string['actividades'] = 'Activities (IDs)';
+$string['actividades'] = 'Activities (IDs) blocked by the administrator';
 $string['actividades_help'] = 'IDs of the activities to block, separated by commas. The ID is in the activity address: .../mod/quiz/view.php?id=42.';
 $string['error_actividades'] = 'Only numbers separated by commas.';
 $string['error_actividadesnoexisten'] = 'Some ID does not match an existing activity.';
@@ -222,3 +222,20 @@ $string['quienes_desc'] = 'Every user whose API check indicates debt, regardless
 $string['buscar'] = 'Search';
 $string['datosenviados'] = 'Data sent to the API';
 $string['masresultados'] = 'Showing the first 25; type something more specific.';
+$string['diagnostico'] = 'Diagnostics';
+$string['diagnostico_desc'] = 'Checks, for your user, each step before a notice is shown. If everything is green, the notice should appear at the top of this page as on the Dashboard; if it appears here but not on the Dashboard, the cause is the theme or that page.';
+$string['diagnostico_paso'] = 'Step';
+$string['diagnostico_detalle'] = 'Detail';
+$string['accion_ninguna'] = 'None (only block resources)';
+$string['recursos'] = 'Allow blocking resources';
+$string['recursos_desc'] = 'Teachers can block their activities (assignment, quiz...) with this rule';
+$string['recursos_help'] = 'Independent of the action. With this option, each activity settings page shows "Debt block": the teacher picks this rule and what is blocked (assignments: add/submit; quizzes: start attempt; or the whole activity). A student with debt sees the activity with the message and, when trying to submit or start, sees the message with the payment button. Optionally the administrator can also block by ID, type, category or course.';
+$string['recursos_corto'] = 'resources';
+$string['cm_titulo'] = 'Debt block';
+$string['cm_regla'] = 'Block with rule';
+$string['cm_regla_help'] = 'If the student has debt according to this rule, they cannot do the activity and see the custom message with the payment button.';
+$string['cm_nobloquear'] = 'Do not block';
+$string['cm_modo'] = 'What is blocked';
+$string['cm_modo_entregar_assign'] = 'Only add/submit (can view the assignment)';
+$string['cm_modo_entregar_quiz'] = 'Only start the attempt (can view the quiz)';
+$string['cm_modo_entrar'] = 'The whole activity';

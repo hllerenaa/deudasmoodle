@@ -41,6 +41,7 @@ Todo está en una sola pantalla con pestañas:
 | **Reglas** | Lista de reglas: activar/desactivar, editar, **Probar**, borrar |
 | **Nueva regla** | Crear una regla |
 | **Contrato de la API** | Qué envía Moodle a la API de cada regla y qué espera recibir. Para entregar al equipo que desarrolla la API |
+| **Diagnóstico** | Revisa paso a paso, para su usuario, por qué un aviso sale o no sale |
 | **Ajustes** | Interruptor general y permiso para APIs en la red interna (solo administradores) |
 
 Permisos: `local/reglasdeuda:gestionar` (gestionar reglas; por defecto, Gestor)
@@ -93,23 +94,30 @@ como números (`{"deuda_maxima": 0.0, "solo_vencido": true}`); los campos de Moo
 siempre como texto (la cédula conserva el 0 inicial). Los campos de datos y de
 mensaje pueden quedar vacíos si no se usan.
 
-### Acción
-| Acción | Qué ve el estudiante |
+### Acción y bloqueo de recursos (paso 3)
+**Acción** (qué pasa en general):
+
+| Acción | Qué ve el usuario con deuda |
 |---|---|
-| **Bloquear acceso a la plataforma** | Al entrar, una página con el mensaje y *Cerrar sesión*. No puede navegar |
-| **Bloquear recursos** | Al abrir las actividades elegidas, el mensaje y *Volver al curso*. El resto del curso funciona |
-| **Solo mostrar mensaje** | Entra a todo; ve el aviso en el *Área personal*, *Mis cursos* y al entrar a cada curso |
+| **Solo mostrar mensaje** | Aviso en Página principal, Área personal, Mis cursos y al entrar a cada curso |
+| **Bloquear acceso a la plataforma** | Página con el mensaje y *Cerrar sesión*. **No aplica a administradores, gestores ni docentes** |
+| **Ninguna** | Nada general; solo se usa el bloqueo de recursos |
 
-Para **Bloquear recursos** se eligen:
-- **Actividades (IDs)**: separados por comas. El ID está en la dirección de la
-  actividad: `.../mod/quiz/view.php?id=`**`42`**.
-- y/o **Bloquear también por tipo, categoría o curso**: p. ej. todos los
-  *Cuestionarios* de la categoría *Pregrado* (un filtro vacío = todos).
+Avisos y bloqueo de recursos se aplican a **todos** los usuarios con deuda, sin importar el rol.
 
-**Roles a los que aplica**: en reglas nuevas viene marcado *Estudiante*; la regla
-solo afecta a quien tenga alguno de esos roles en cualquier curso. Vacío = aplica
-a todos. Los administradores y quien tenga `local/reglasdeuda:exento` nunca
-quedan afectados.
+**Permitir bloquear recursos** (independiente de la acción): en la configuración de
+cada actividad aparece la sección **"Bloqueo por deuda"**, donde el docente elige la
+regla y qué se bloquea:
+
+| Actividad | Opciones |
+|---|---|
+| Tarea | *Solo agregar/enviar la entrega* (puede ver la tarea) o *Toda la actividad* |
+| Cuestionario | *Solo iniciar el intento* (puede ver el cuestionario) o *Toda la actividad* |
+| Otras | Toda la actividad |
+
+El estudiante con deuda ve la actividad con el mensaje arriba y, al pulsar
+*Agregar entrega* o *Comenzar intento*, ve el mensaje con el botón de pago.
+El administrador puede además bloquear por ID, tipo de actividad, categoría o curso.
 
 ### Mensaje
 - **Título**, **Mensaje** (editor con formato), **Texto del botón**, **Enlace del

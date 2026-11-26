@@ -29,4 +29,8 @@ $observers = [
         'eventname' => '\core\event\user_deleted',
         'callback' => '\local_reglasdeuda\observador::usuario_borrado',
     ],
+    [
+        'eventname' => '\core\event\course_module_deleted',
+        'callback' => '\local_reglasdeuda\observador::actividad_borrada',
+    ],
 ];

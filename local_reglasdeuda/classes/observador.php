@@ -30,4 +30,12 @@ class observador {
     public static function usuario_borrado(\core\event\user_deleted $evento): void {
         local\evaluador::olvidar_usuario((int)$evento->objectid);
     }
+
+    /**
+     * @param \core\event\course_module_deleted $evento
+     */
+    public static function actividad_borrada(\core\event\course_module_deleted $evento): void {
+        global $DB;
+        $DB->delete_records(local\recursos::TABLA, ['cmid' => (int)$evento->objectid]);
+    }
 }

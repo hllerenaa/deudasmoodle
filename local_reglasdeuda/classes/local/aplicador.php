@@ -93,14 +93,48 @@ class aplicador {
         }
 
         if ($cm && $curso && self::primera_vez('cm' . $cm->id)) {
-            foreach (reglas::activas_por_accion(reglas::ACCION_RESTRINGIR) as $regla) {
-                if (self::cubre_actividad($regla, $cm, $curso) && self::aplica($regla, $contexto)) {
-                    self::cortar($sinredireccion, new \moodle_url('/local/reglasdeuda/bloqueado.php',
-                        ['regla' => $regla->id, 'cmid' => $cm->id]));
-                }
-            }
+            self::bloquear_actividad($cm, $curso, $contexto, $sinredireccion);
         }
 
+    }
+
+    /**
+     * Bloqueo de recursos: la actividad la eligio el docente (en su configuracion) o el admin (IDs o filtros).
+     * En modo "entregar" (tarea/cuestionario) se puede ver la actividad, con el aviso; se bloquea solo
+     * iniciar el intento o agregar/enviar la entrega.
+     *
+     * @param \cm_info|\stdClass $cm
+     * @param \stdClass $curso
+     * @param array $contexto
+     * @param bool $sinredireccion
+     */
+    private static function bloquear_actividad($cm, \stdClass $curso, array $contexto, bool $sinredireccion): void {
+        global $SCRIPT, $USER;
+        $config = recursos::de_actividad((int)$cm->id);
+        foreach (recursos::reglas() as $regla) {
+            $modo = null;
+            if ($config && (int)$config->reglaid === (int)$regla->id) {
+                $modo = $config->modo;
+            } else if (self::cubre_actividad($regla, $cm, $curso)) {
+                $modo = recursos::MODO_ENTRAR;
+            }
+            if ($modo === null || !self::aplica($regla, $contexto, $evaluacion)) {
+                continue;
+            }
+            $modname = $cm->modname ?? '';
+            $bloquear = $modo === recursos::MODO_ENTRAR
+                || !in_array($modname, recursos::MODULOS_ENTREGA, true)
+                || recursos::es_accion_de_entrega($modname, (string)$SCRIPT);
+            if ($bloquear) {
+                self::cortar($sinredireccion, new \moodle_url('/local/reglasdeuda/bloqueado.php',
+                    ['regla' => $regla->id, 'cmid' => $cm->id]));
+            }
+            if (!$sinredireccion && self::primera_vez('avisocm' . $cm->id)) {
+                // Puede ver la actividad, pero se le avisa que no podra entregar/iniciar.
+                $c = mensaje::contexto($regla, $evaluacion, $USER, $contexto);
+                \core\notification::add(mensaje::html($c, false), mensaje::NOTIFICACION[$c['estilo']]);
+            }
+        }
     }
 
     /**

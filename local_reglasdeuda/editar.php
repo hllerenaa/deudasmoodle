@@ -150,26 +150,28 @@ class local_reglasdeuda_editor_regla extends \moodleform {
         $f->setExpanded('h_accion');
         $f->addElement('select', 'accion', get_string('accion', $c), reglas::opciones_accion());
         $f->addHelpButton('accion', 'accion', $c);
+        $f->addElement('advcheckbox', 'recursos', get_string('recursos', $c), get_string('recursos_desc', $c));
+        $f->addHelpButton('recursos', 'recursos', $c);
         $f->addElement('text', 'actividades', get_string('actividades', $c), ['size' => 40]);
         $f->setType('actividades', PARAM_RAW_TRIMMED);
         $f->addHelpButton('actividades', 'actividades', $c);
-        $f->hideIf('actividades', 'accion', 'neq', reglas::ACCION_RESTRINGIR);
+        $f->hideIf('actividades', 'recursos', 'notchecked');
         $f->addElement('advcheckbox', 'globalactivo', get_string('globalactivo', $c));
         $f->addHelpButton('globalactivo', 'globalactivo', $c);
-        $f->hideIf('globalactivo', 'accion', 'neq', reglas::ACCION_RESTRINGIR);
+        $f->hideIf('globalactivo', 'recursos', 'notchecked');
         $f->addElement('autocomplete', 'globalmodulos', get_string('globalmodulos', $c), self::modulos(),
             ['multiple' => true, 'noselectionstring' => get_string('todos', $c)]);
-        $f->hideIf('globalmodulos', 'accion', 'neq', reglas::ACCION_RESTRINGIR);
+        $f->hideIf('globalmodulos', 'recursos', 'notchecked');
         $f->hideIf('globalmodulos', 'globalactivo', 'notchecked');
         $f->addElement('autocomplete', 'globalcategorias', get_string('globalcategorias', $c),
             \core_course_category::make_categories_list(), ['multiple' => true, 'noselectionstring' => get_string('todas', $c)]);
         $f->addHelpButton('globalcategorias', 'globalcategorias', $c);
-        $f->hideIf('globalcategorias', 'accion', 'neq', reglas::ACCION_RESTRINGIR);
+        $f->hideIf('globalcategorias', 'recursos', 'notchecked');
         $f->hideIf('globalcategorias', 'globalactivo', 'notchecked');
         $f->addElement('course', 'globalcursos', get_string('globalcursos', $c),
             ['multiple' => true, 'includefrontpage' => false, 'noselectionstring' => get_string('todos', $c)]);
         $f->addHelpButton('globalcursos', 'globalcursos', $c);
-        $f->hideIf('globalcursos', 'accion', 'neq', reglas::ACCION_RESTRINGIR);
+        $f->hideIf('globalcursos', 'recursos', 'notchecked');
         $f->hideIf('globalcursos', 'globalactivo', 'notchecked');
         $f->addElement('static', 'quienes', get_string('quienes', $c), get_string('quienes_desc', $c));
 
@@ -245,7 +247,7 @@ class local_reglasdeuda_editor_regla extends \moodleform {
         if (trim($data['botonurlrespaldo']) !== '' && !mensaje::es_url_web(trim($data['botonurlrespaldo']))) {
             $errores['botonurlrespaldo'] = get_string('error_url', $c);
         }
-        if ($data['accion'] === reglas::ACCION_RESTRINGIR) {
+        if (!empty($data['recursos'])) {
             $cmids = reglas::csv($data['actividades']);
             $novalidos = array_filter($cmids, function($v) {
                 return !ctype_digit($v);
@@ -254,8 +256,6 @@ class local_reglasdeuda_editor_regla extends \moodleform {
                 $errores['actividades'] = get_string('error_actividades', $c);
             } else if ($cmids && count(array_unique($cmids)) !== $DB->count_records_list('course_modules', 'id', $cmids)) {
                 $errores['actividades'] = get_string('error_actividadesnoexisten', $c);
-            } else if (!$cmids && empty($data['globalactivo'])) {
-                $errores['actividades'] = get_string('error_sinalcance', $c);
             }
         }
         if ($data['cachettl'] < reglas::TTL_MINIMO || $data['cachettl'] > reglas::TTL_MAXIMO) {
@@ -397,7 +397,7 @@ if ($enviado = $form->get_data()) {
     $guardar->actividades = implode(',', array_unique(array_map('intval', reglas::csv($enviado->actividades ?? ''))));
     $guardar->mensaje = $enviado->mensaje_editor['text'];
     $guardar->mensajeformat = (int)$enviado->mensaje_editor['format'];
-    if ($guardar->accion !== reglas::ACCION_RESTRINGIR) {
+    if (empty($guardar->recursos)) {
         $guardar->globalactivo = 0;
         $guardar->actividades = '';
     }

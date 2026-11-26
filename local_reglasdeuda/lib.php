@@ -24,6 +24,32 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Agrega "Bloqueo por deuda" a la configuracion de cada actividad (si hay reglas con recursos).
+ *
+ * @param moodleform_mod $formwrapper
+ * @param MoodleQuickForm $mform
+ */
+function local_reglasdeuda_coursemodule_standard_elements($formwrapper, $mform) {
+    try {
+        \local_reglasdeuda\local\recursos::agregar_campos($formwrapper, $mform);
+    } catch (\Throwable $e) {
+        error_log('local_reglasdeuda: ' . $e->getMessage());
+    }
+}
+
+/**
+ * Guarda "Bloqueo por deuda" al guardar la actividad.
+ *
+ * @param stdClass $data
+ * @param stdClass $course
+ * @return stdClass
+ */
+function local_reglasdeuda_coursemodule_edit_post_actions($data, $course) {
+    \local_reglasdeuda\local\recursos::guardar($data);
+    return $data;
+}
+
+/**
  * Avisos de las reglas "solo mensaje" (portada, Area personal, Mis cursos, cursos).
  */
 function local_reglasdeuda_before_http_headers() {

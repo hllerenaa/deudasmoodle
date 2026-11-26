@@ -50,6 +50,8 @@ class pestanas {
             new \tabobject('reglas', new \moodle_url('/local/reglasdeuda/index.php'), get_string('reglas', $c)),
             new \tabobject('nueva', new \moodle_url('/local/reglasdeuda/editar.php'), get_string('nuevaregla', $c)),
             new \tabobject('contrato', new \moodle_url('/local/reglasdeuda/contrato.php'), get_string('contrato', $c)),
+            new \tabobject('diagnostico', new \moodle_url('/local/reglasdeuda/diagnostico.php'),
+                get_string('diagnostico', $c)),
         ];
         if (has_capability('moodle/site:config', \context_system::instance())) {
             $pestanas[] = new \tabobject('ajustes', new \moodle_url('/local/reglasdeuda/ajustes.php'),

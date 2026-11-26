@@ -84,15 +84,15 @@ foreach (reglas::todas() as $regla) {
             ['class' => 'text-danger']),
     ];
     $accion = $acciones[$regla->accion] ?? $regla->accion;
-    if ($regla->accion === reglas::ACCION_RESTRINGIR) {
-        $partes = [];
+    if (!empty($regla->recursos)) {
+        $partes = [get_string('recursos_corto', 'local_reglasdeuda')];
         if ($n = count(reglas::csv($regla->actividades))) {
             $partes[] = get_string('nactividades', 'local_reglasdeuda', $n);
         }
         if ($regla->globalactivo) {
             $partes[] = get_string('global', 'local_reglasdeuda');
         }
-        $accion .= $partes ? ' (' . implode(', ', $partes) . ')' : '';
+        $accion .= ' + ' . implode(', ', $partes);
     }
     $tabla->data[] = [
         format_string($regla->nombre),

@@ -24,6 +24,7 @@
         <FIELD NAME="errorpolitica" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="permitir" SEQUENCE="false" COMMENT="permitir o aplicar"/>
         <FIELD NAME="cachettl" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="900" SEQUENCE="false"/>
         <FIELD NAME="accion" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="avisar" SEQUENCE="false" COMMENT="bloquear, restringir o avisar"/>
+        <FIELD NAME="recursos" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1: los docentes pueden bloquear actividades con esta regla"/>
         <FIELD NAME="actividades" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de cmid bloqueados concretamente"/>
         <FIELD NAME="globalactivo" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="globalmodulos" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de modname; vacio = todos"/>
@@ -47,6 +48,20 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="activa" UNIQUE="false" FIELDS="activa"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_reglasdeuda_cm" COMMENT="Bloqueo por deuda configurado por el docente en cada actividad">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="reglaid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="modo" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="entregar" SEQUENCE="false" COMMENT="entrar o entregar"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="cmid" UNIQUE="true" FIELDS="cmid"/>
       </INDEXES>
     </TABLE>
   </TABLES>

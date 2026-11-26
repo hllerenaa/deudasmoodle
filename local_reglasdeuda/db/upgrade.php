@@ -88,5 +88,27 @@ function xmldb_local_reglasdeuda_upgrade($oldversion) {
         \cache::make('local_reglasdeuda', 'reglas')->purge();
         upgrade_plugin_savepoint(true, 2026112603, 'local', 'reglasdeuda');
     }
+    if ($oldversion < 2026112612) {
+        $tabla = new xmldb_table('local_reglasdeuda_reglas');
+        $campo = new xmldb_field('recursos', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        if (!$dbman->field_exists($tabla, $campo)) {
+            $dbman->add_field($tabla, $campo);
+        }
+        // "Bloquear recursos" deja de ser una accion: pasa a la opcion "Permitir bloquear recursos".
+        $DB->execute("UPDATE {local_reglasdeuda_reglas} SET recursos = 1, accion = 'ninguna' WHERE accion = 'restringir'");
+
+        $cm = new xmldb_table('local_reglasdeuda_cm');
+        if (!$dbman->table_exists($cm)) {
+            $cm->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $cm->add_field('cmid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $cm->add_field('reglaid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $cm->add_field('modo', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'entregar');
+            $cm->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $cm->add_index('cmid', XMLDB_INDEX_UNIQUE, ['cmid']);
+            $dbman->create_table($cm);
+        }
+        \cache::make('local_reglasdeuda', 'reglas')->purge();
+        upgrade_plugin_savepoint(true, 2026112612, 'local', 'reglasdeuda');
+    }
     return true;
 }

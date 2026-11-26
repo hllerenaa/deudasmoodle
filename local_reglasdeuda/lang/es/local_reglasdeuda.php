@@ -33,9 +33,9 @@ $string['accion_avisar'] = 'Solo mostrar mensaje (Area personal y cursos)';
 $string['accion_bloquear'] = 'Bloquear acceso a la plataforma';
 $string['accion_help'] = 'Que ocurre cuando la regla se activa:
 
-* **Bloquear plataforma**: al iniciar sesion el usuario ve el mensaje y no puede navegar.
-* **Bloquear recursos**: al intentar entrar a las actividades elegidas (por ID, o todas las de ciertos tipos, categorias y cursos) ve el mensaje y un boton para volver al curso.
-* **Solo mensaje**: puede entrar a todo; ve el aviso en el Area personal y al entrar a cada curso.';
+* **Solo mostrar mensaje**: aviso en Pagina principal, Area personal, Mis cursos y cursos.
+* **Bloquear plataforma**: al entrar ve el mensaje y no puede navegar (no aplica a administradores ni docentes).
+* **Ninguna**: solo se usa para bloquear recursos (ver "Permitir bloquear recursos").';
 $string['accion_restringir'] = 'Bloquear recursos';
 $string['activa'] = 'Activa';
 $string['activar'] = 'Activar';
@@ -170,7 +170,7 @@ $string['cachedef_resultados'] = 'Resultados de la API por regla y usuario';
 $string['error_token'] = 'El token no puede contener saltos de linea.';
 $string['privacy:metadata:apiexterna:fullname'] = 'Nombre y apellido del usuario.';
 $string['privacy:metadata:apiexterna:userid'] = 'Id del usuario en Moodle.';
-$string['actividades'] = 'Actividades (IDs)';
+$string['actividades'] = 'Actividades (IDs) bloqueadas por el administrador';
 $string['actividades_help'] = 'IDs de las actividades a bloquear, separados por comas. El ID aparece en la direccion de la actividad: .../mod/quiz/view.php?id=42.';
 $string['error_actividades'] = 'Solo numeros separados por comas.';
 $string['error_actividadesnoexisten'] = 'Alguno de los IDs no corresponde a una actividad existente.';
@@ -222,3 +222,20 @@ $string['quienes_desc'] = 'A todos los usuarios cuya consulta a la API indique d
 $string['buscar'] = 'Buscar';
 $string['datosenviados'] = 'Datos que se envian a la API';
 $string['masresultados'] = 'Se muestran los primeros 25; escriba algo mas especifico.';
+$string['diagnostico'] = 'Diagnostico';
+$string['diagnostico_desc'] = 'Revisa, para su usuario, cada paso antes de mostrar un aviso. Si todo esta en verde, arriba de esta pagina debe aparecer el aviso tal como en el Area personal; si aparece aqui y no en el Area personal, el problema es del tema o de esa pagina.';
+$string['diagnostico_paso'] = 'Paso';
+$string['diagnostico_detalle'] = 'Detalle';
+$string['accion_ninguna'] = 'Ninguna (solo bloquear recursos)';
+$string['recursos'] = 'Permitir bloquear recursos';
+$string['recursos_desc'] = 'Los docentes podran bloquear sus actividades (tarea, cuestionario...) con esta regla';
+$string['recursos_help'] = 'Independiente de la accion. Con esta opcion, en la configuracion de cada actividad aparece "Bloqueo por deuda": el docente elige esta regla y que se bloquea (en tareas: agregar/enviar la entrega; en cuestionarios: iniciar el intento; o toda la actividad). El estudiante con deuda ve la actividad con el mensaje y, al intentar entregar o iniciar, ve el mensaje con el boton de pago. Opcionalmente, el administrador puede bloquear tambien por ID, tipo, categoria o curso.';
+$string['recursos_corto'] = 'recursos';
+$string['cm_titulo'] = 'Bloqueo por deuda';
+$string['cm_regla'] = 'Bloquear con la regla';
+$string['cm_regla_help'] = 'Si el estudiante tiene deuda segun esta regla, no podra realizar la actividad y vera el mensaje personalizado con el boton de pago.';
+$string['cm_nobloquear'] = 'No bloquear';
+$string['cm_modo'] = 'Que se bloquea';
+$string['cm_modo_entregar_assign'] = 'Solo agregar/enviar la entrega (puede ver la tarea)';
+$string['cm_modo_entregar_quiz'] = 'Solo iniciar el intento (puede ver el cuestionario)';
+$string['cm_modo_entrar'] = 'Toda la actividad';

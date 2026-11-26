@@ -29,6 +29,7 @@ class reglas {
     const ACCION_BLOQUEAR = 'bloquear';
     const ACCION_RESTRINGIR = 'restringir';
     const ACCION_AVISAR = 'avisar';
+    const ACCION_NINGUNA = 'ninguna';
 
     /** Tiempo minimo de cache (s): evita una consulta HTTP por cada pagina. */
     const TTL_MINIMO = 60;
@@ -61,6 +62,7 @@ class reglas {
             'errorpolitica' => 'permitir',
             'cachettl' => 900,
             'accion' => self::ACCION_AVISAR,
+            'recursos' => 0,
             'actividades' => '',
             'globalactivo' => 0,
             'globalmodulos' => '',
@@ -192,9 +194,9 @@ class reglas {
      */
     public static function opciones_accion(): array {
         return [
-            self::ACCION_BLOQUEAR => get_string('accion_bloquear', 'local_reglasdeuda'),
-            self::ACCION_RESTRINGIR => get_string('accion_restringir', 'local_reglasdeuda'),
             self::ACCION_AVISAR => get_string('accion_avisar', 'local_reglasdeuda'),
+            self::ACCION_BLOQUEAR => get_string('accion_bloquear', 'local_reglasdeuda'),
+            self::ACCION_NINGUNA => get_string('accion_ninguna', 'local_reglasdeuda'),
         ];
     }
 }
