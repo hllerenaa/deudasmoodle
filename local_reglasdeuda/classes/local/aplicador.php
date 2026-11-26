@@ -44,7 +44,7 @@ class aplicador {
     ];
 
     /** Paginas donde se muestra el aviso de las reglas "solo mensaje". */
-    const SCRIPTS_AVISO = ['/my/index.php', '/my/courses.php', '/course/view.php'];
+    const SCRIPTS_AVISO = ['/index.php', '/my/index.php', '/my/courses.php', '/course/view.php'];
 
     /** @var array claves ya procesadas en esta peticion (require_login puede llamarse varias veces). */
     private static $hecho = [];
@@ -101,12 +101,31 @@ class aplicador {
             }
         }
 
-        if (!$sinredireccion && in_array($SCRIPT, self::SCRIPTS_AVISO, true) && self::primera_vez('avisar')) {
-            foreach (reglas::activas_por_accion(reglas::ACCION_AVISAR) as $regla) {
-                if (self::aplica($regla, $contexto, $evaluacion)) {
-                    $c = mensaje::contexto($regla, $evaluacion, $USER, $contexto);
-                    \core\notification::add(mensaje::html($c, false), mensaje::NOTIFICACION[$c['estilo']]);
-                }
+    }
+
+    /**
+     * Avisos de las reglas "solo mensaje" en Pagina principal, Area personal, Mis cursos y cursos.
+     *
+     * Se llama antes de enviar la cabecera de la pagina (before_http_headers): asi tambien funciona
+     * en la portada, que no pasa por require_login, y las notificaciones aun no se han pintado.
+     */
+    public static function avisos_pagina(): void {
+        global $USER, $SCRIPT, $CFG, $PAGE;
+        if (CLI_SCRIPT || AJAX_SCRIPT || during_initial_install() || !empty($CFG->upgraderunning)) {
+            return;
+        }
+        if (!isloggedin() || isguestuser() || !get_config('local_reglasdeuda', 'habilitado')) {
+            return;
+        }
+        if (!in_array($SCRIPT, self::SCRIPTS_AVISO, true) || !self::primera_vez('avisar')) {
+            return;
+        }
+        $curso = ($PAGE->course && $PAGE->course->id != SITEID) ? $PAGE->course : null;
+        $contexto = ['curso' => $curso, 'cmid' => null];
+        foreach (reglas::activas_por_accion(reglas::ACCION_AVISAR) as $regla) {
+            if (self::aplica($regla, $contexto, $evaluacion)) {
+                $c = mensaje::contexto($regla, $evaluacion, $USER, $contexto);
+                \core\notification::add(mensaje::html($c, false), mensaje::NOTIFICACION[$c['estilo']]);
             }
         }
     }

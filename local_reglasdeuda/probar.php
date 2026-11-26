@@ -21,15 +21,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_reglasdeuda\formularios\probar_form;
 use local_reglasdeuda\local\evaluador;
 use local_reglasdeuda\local\mensaje;
 use local_reglasdeuda\local\pestanas;
 use local_reglasdeuda\local\reglas;
 
 require_once(__DIR__ . '/../../config.php');
-// Carga explicita: no depende del mapa de clases en cache de Moodle ("Class not found" tras actualizar).
-require_once(__DIR__ . '/classes/formularios/probar_form.php');
 
 $id = required_param('id', PARAM_INT);
 
@@ -54,8 +51,35 @@ if (optional_param('usarejemplo', 0, PARAM_BOOL) && confirm_sesskey()) {
     }
 }
 
-$form = new probar_form($url);
-$form->set_data(['id' => $id]);
+// Formulario simple (sin moodleform): usuario a probar.
+$textousuario = trim(optional_param('usuario', '', PARAM_RAW_TRIMMED));
+$usuario = null;
+$errorusuario = '';
+if ($textousuario !== '' && confirm_sesskey()) {
+    $usuario = local_reglasdeuda_buscar_usuario($textousuario);
+    if (!$usuario) {
+        $errorusuario = get_string('probar_nousuario', $c);
+    }
+}
+
+/**
+ * Busca un usuario por nombre de usuario, correo o numero de ID (el primero que coincida).
+ *
+ * @param string $texto
+ * @return stdClass|null
+ */
+function local_reglasdeuda_buscar_usuario(string $texto): ?stdClass {
+    global $DB;
+    $usuario = core_user::get_user_by_username(core_text::strtolower($texto));
+    if (!$usuario) {
+        $usuario = core_user::get_user_by_email($texto);
+    }
+    if (!$usuario) {
+        $encontrados = $DB->get_records('user', ['idnumber' => $texto, 'deleted' => 0], 'id ASC', '*', 0, 1);
+        $usuario = $encontrados ? reset($encontrados) : false;
+    }
+    return ($usuario && empty($usuario->deleted)) ? $usuario : null;
+}
 
 echo $OUTPUT->header();
 echo pestanas::html('reglas');
@@ -64,10 +88,20 @@ echo html_writer::div(
     html_writer::link(new moodle_url('/local/reglasdeuda/editar.php', ['id' => $id]), get_string('edit')) . ' · ' .
     html_writer::link(new moodle_url('/local/reglasdeuda/index.php'), get_string('reglas', $c)), 'mb-3');
 echo $OUTPUT->notification(get_string('probar_aviso', $c), 'info');
-$form->display();
+echo html_writer::start_tag('form', ['method' => 'post', 'action' => $url->out(false), 'class' => 'form-inline mb-3']);
+echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
+echo html_writer::tag('label', get_string('probar_usuario', $c), ['for' => 'id_usuario', 'class' => 'me-2 mr-2']);
+echo html_writer::empty_tag('input', ['type' => 'text', 'name' => 'usuario', 'id' => 'id_usuario', 'size' => 30,
+    'class' => 'form-control me-2 mr-2', 'value' => $textousuario,
+    'placeholder' => get_string('probar_usuario_ph', $c)]);
+echo html_writer::empty_tag('input', ['type' => 'submit', 'class' => 'btn btn-primary',
+    'value' => get_string('probar', $c)]);
+echo html_writer::end_tag('form');
+if ($errorusuario !== '') {
+    echo $OUTPUT->notification($errorusuario, 'error');
+}
 
-if ($datos = $form->get_data()) {
-    $usuario = probar_form::buscar_usuario($datos->usuario);
+if ($usuario) {
     $ev = evaluador::evaluar($regla, $usuario, [], false);
     $SESSION->local_reglasdeuda_ultima[$id] = $ev['respuesta'];
 

@@ -24,6 +24,18 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Avisos de las reglas "solo mensaje" (portada, Area personal, Mis cursos, cursos).
+ */
+function local_reglasdeuda_before_http_headers() {
+    // Moodle 4.1 a 4.3. En 4.4+ lo reemplaza db/hooks.php (Moodle ignora este callback si existe el hook).
+    try {
+        \local_reglasdeuda\local\aplicador::avisos_pagina();
+    } catch (\Throwable $e) {
+        error_log('local_reglasdeuda: ' . $e->getMessage());
+    }
+}
+
+/**
  * Se ejecuta al final de cada require_login (Moodle 4.1 a 5.1; no existe hook que lo reemplace).
  *
  * @param mixed $courseorid

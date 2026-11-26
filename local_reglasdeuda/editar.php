@@ -94,5 +94,9 @@ $PAGE->requires->js_call_amd('local_reglasdeuda/variables', 'init', ['local-regl
 echo $OUTPUT->header();
 echo pestanas::html($id ? 'reglas' : 'nueva');
 echo $OUTPUT->heading($titulo, 3);
+if ($id) {
+    echo html_writer::div(html_writer::link(new moodle_url('/local/reglasdeuda/probar.php', ['id' => $id]),
+        get_string('probar', 'local_reglasdeuda'), ['class' => 'btn btn-secondary']), 'mb-3');
+}
 $form->display();
 echo $OUTPUT->footer();
