@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_reglasdeuda\form;
+namespace local_reglasdeuda\formularios;
 
 use local_reglasdeuda\local\cliente_api;
 use local_reglasdeuda\local\mensaje;

@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_reglasdeuda\form\probar_form;
+use local_reglasdeuda\formularios\probar_form;
 use local_reglasdeuda\local\evaluador;
 use local_reglasdeuda\local\mensaje;
 use local_reglasdeuda\local\pestanas;
@@ -29,7 +29,7 @@ use local_reglasdeuda\local\reglas;
 
 require_once(__DIR__ . '/../../config.php');
 // Carga explicita: no depende del mapa de clases en cache de Moodle ("Class not found" tras actualizar).
-require_once(__DIR__ . '/classes/form/probar_form.php');
+require_once(__DIR__ . '/classes/formularios/probar_form.php');
 
 $id = required_param('id', PARAM_INT);
 

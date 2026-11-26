@@ -21,12 +21,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_reglasdeuda\form\ajustes_form;
+use local_reglasdeuda\formularios\ajustes_form;
 use local_reglasdeuda\local\pestanas;
 
 require_once(__DIR__ . '/../../config.php');
 // Carga explicita: no depende del mapa de clases en cache de Moodle ("Class not found" tras actualizar).
-require_once(__DIR__ . '/classes/form/ajustes_form.php');
+require_once(__DIR__ . '/classes/formularios/ajustes_form.php');
 
 $url = new moodle_url('/local/reglasdeuda/ajustes.php');
 pestanas::configurar_pagina($url, get_string('ajustesgenerales', 'local_reglasdeuda'));

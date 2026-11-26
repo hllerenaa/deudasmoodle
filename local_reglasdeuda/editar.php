@@ -21,14 +21,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_reglasdeuda\form\regla_form;
+use local_reglasdeuda\formularios\regla_form;
 use local_reglasdeuda\local\parametros;
 use local_reglasdeuda\local\pestanas;
 use local_reglasdeuda\local\reglas;
 
 require_once(__DIR__ . '/../../config.php');
 // Carga explicita: no depende del mapa de clases en cache de Moodle ("Class not found" tras actualizar).
-require_once(__DIR__ . '/classes/form/regla_form.php');
+require_once(__DIR__ . '/classes/formularios/regla_form.php');
 
 $id = optional_param('id', 0, PARAM_INT);
 
