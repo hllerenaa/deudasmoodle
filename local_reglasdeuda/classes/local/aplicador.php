@@ -41,6 +41,7 @@ class aplicador {
         '/user/policy.php',
         '/user/edit.php',
         '/user/editadvanced.php',
+        '/course/switchrole.php', // "Volver a mi rol normal".
     ];
 
     /** Paginas donde se muestra el aviso de las reglas "solo mensaje". */

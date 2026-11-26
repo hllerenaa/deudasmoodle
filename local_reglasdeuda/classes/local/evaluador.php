@@ -39,10 +39,17 @@ class evaluador {
      * @return bool
      */
     public static function esta_exento(\stdClass $regla, int $userid): bool {
-        global $DB;
+        global $DB, $USER;
         $clave = $regla->id . '_' . $userid;
         if (isset(self::$memo['exento'][$clave])) {
             return self::$memo['exento'][$clave];
+        }
+        // "Cambiar rol a..." (p.ej. un administrador probando como Estudiante): se evalua con el rol
+        // elegido y no con los permisos reales, para poder probar las reglas con la propia cuenta.
+        if ($userid == $USER->id && !empty($USER->access['rsw'])) {
+            $roles = array_map('intval', reglas::csv($regla->rolesaplica));
+            $cambiados = array_map('intval', array_values($USER->access['rsw']));
+            return self::$memo['exento'][$clave] = ($roles && !array_intersect($roles, $cambiados));
         }
         $exento = is_siteadmin($userid)
             || has_capability('local/reglasdeuda:exento', \context_system::instance(), $userid);

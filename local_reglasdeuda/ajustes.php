@@ -21,19 +21,40 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_reglasdeuda\formularios\ajustes_form;
+use local_reglasdeuda\local\archivos;
 use local_reglasdeuda\local\pestanas;
 
 require_once(__DIR__ . '/../../config.php');
-// Carga explicita: no depende del mapa de clases en cache de Moodle ("Class not found" tras actualizar).
-require_once(__DIR__ . '/classes/formularios/ajustes_form.php');
+require_once($CFG->libdir . '/formslib.php');
+// El formulario va dentro de esta pagina y no en un archivo aparte: el antivirus del hosting
+// borraba los archivos de formularios sueltos (classes/form/, classes/formularios/).
+
+/**
+ * Ajustes generales del plugin (pestana Ajustes).
+ *
+ * @package    local_reglasdeuda
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class local_reglasdeuda_editor_ajustes extends \moodleform {
+
+    protected function definition() {
+        $f = $this->_form;
+        $c = 'local_reglasdeuda';
+        $f->addElement('advcheckbox', 'habilitado', get_string('habilitado', $c));
+        $f->addElement('static', 'habilitado_desc', '', get_string('habilitado_desc', $c));
+        $f->addElement('advcheckbox', 'hostsinternos', get_string('hostsinternos', $c));
+        $f->addElement('static', 'hostsinternos_desc', '', get_string('hostsinternos_desc', $c));
+        $this->add_action_buttons(false);
+    }
+}
+
 
 $url = new moodle_url('/local/reglasdeuda/ajustes.php');
 pestanas::configurar_pagina($url, get_string('ajustesgenerales', 'local_reglasdeuda'));
 // "Hosts internos" abre peticiones a la red privada (SSRF): solo quien puede configurar el sitio.
 require_capability('moodle/site:config', context_system::instance());
 
-$form = new ajustes_form($url);
+$form = new local_reglasdeuda_editor_ajustes($url);
 $form->set_data([
     'habilitado' => (int)get_config('local_reglasdeuda', 'habilitado'),
     'hostsinternos' => (int)get_config('local_reglasdeuda', 'hostsinternos'),
@@ -48,5 +69,9 @@ if ($datos = $form->get_data()) {
 
 echo $OUTPUT->header();
 echo pestanas::html('ajustes');
+// Verificacion de archivos: detecta lo que el antivirus del hosting haya borrado o modificado.
+echo $OUTPUT->heading(get_string('verificacion', 'local_reglasdeuda'), 4);
+$problemas = archivos::aviso(true);
+echo $problemas !== '' ? $problemas : $OUTPUT->notification(get_string('verificacion_ok', 'local_reglasdeuda'), 'success');
 $form->display();
 echo $OUTPUT->footer();

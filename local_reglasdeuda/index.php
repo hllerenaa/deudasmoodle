@@ -54,6 +54,7 @@ if ($accion && $id && ($regla = reglas::obtener($id))) {
 
 echo $OUTPUT->header();
 echo pestanas::html('reglas');
+echo \local_reglasdeuda\local\archivos::aviso();
 
 if (!get_config('local_reglasdeuda', 'habilitado')) {
     echo $OUTPUT->notification(get_string('plugindeshabilitado', 'local_reglasdeuda'), 'warning');

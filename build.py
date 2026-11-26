@@ -13,6 +13,8 @@ Uso:
     python build.py --release 0.2.0     # cambia $plugin->release en ambos
 """
 import argparse
+import hashlib
+import json
 import datetime
 import re
 import sys
@@ -23,6 +25,7 @@ ROOT = Path(__file__).resolve().parent
 PLUGINS = ["local_reglasdeuda"]
 DIST = ROOT / "dist"
 ENCODING = "utf-8"
+MANIFIESTO = "archivos.json"
 
 EXCLUDE_NAMES = {".git", ".gitignore", ".DS_Store", "Thumbs.db", "__pycache__", "node_modules", ".idea"}
 EXCLUDE_SUFFIXES = {".pyc", ".zip"}
@@ -98,6 +101,13 @@ def build(plugin):
     def excluded(path):
         rel = path.relative_to(src)
         return any(part in EXCLUDE_NAMES for part in rel.parts) or path.suffix in EXCLUDE_SUFFIXES
+
+    # Manifiesto: sha1 de cada archivo, para que el plugin detecte lo que el antivirus del hosting borre.
+    manifiesto = {}
+    for path in sorted(src.rglob("*")):
+        if path.is_file() and not excluded(path) and path.name != MANIFIESTO:
+            manifiesto[path.relative_to(src).as_posix()] = hashlib.sha1(path.read_bytes()).hexdigest()
+    (src / MANIFIESTO).write_text(json.dumps(manifiesto, indent=1, sort_keys=True) + "\n", encoding="utf-8")
 
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
         for path in sorted(src.rglob("*")):
