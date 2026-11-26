@@ -49,29 +49,61 @@ class evaluador {
         if ($regla->accion !== reglas::ACCION_BLOQUEAR) {
             return false;
         }
-        $clave = $regla->id . '_' . $userid;
-        if (isset(self::$memo['exento'][$clave])) {
-            return self::$memo['exento'][$clave];
+        if (!isset(self::$memo['exento'][$userid])) {
+            self::$memo['exento'][$userid] = self::motivo_exencion($userid) !== '';
         }
+        return self::$memo['exento'][$userid];
+    }
+
+    /**
+     * Por que el bloqueo de plataforma no se aplica a este usuario ('' si se le aplica).
+     * Exentos: administradores del sitio, permiso local/reglasdeuda:exento y quien tenga en cualquier
+     * curso o categoria un rol de tipo gestor, creador de cursos, profesor o profesor sin edicion.
+     *
+     * @param int $userid
+     * @return string
+     */
+    public static function motivo_exencion(int $userid): string {
+        global $DB, $USER;
         $libres = [];
         foreach (self::ARQUETIPOS_LIBRES as $arquetipo) {
             foreach (get_archetype_roles($arquetipo) as $rol) {
-                $libres[] = (int)$rol->id;
+                $libres[(int)$rol->id] = $rol;
             }
         }
         // "Cambiar rol a..." (p.ej. un admin probando como Estudiante): cuenta el rol elegido.
         if ($userid == $USER->id && !empty($USER->access['rsw'])) {
-            $cambiados = array_map('intval', array_values($USER->access['rsw']));
-            return self::$memo['exento'][$clave] = (bool)array_intersect($libres, $cambiados);
+            foreach ($USER->access['rsw'] as $rolid) {
+                if (isset($libres[(int)$rolid])) {
+                    return 'cambio de rol a ' . role_get_name($libres[(int)$rolid]);
+                }
+            }
+            return '';
         }
-        $exento = is_siteadmin($userid)
-            || has_capability('local/reglasdeuda:exento', \context_system::instance(), $userid);
-        if (!$exento && $libres) {
-            [$insql, $params] = $DB->get_in_or_equal(array_unique($libres), SQL_PARAMS_NAMED);
-            $params['userid'] = $userid;
-            $exento = $DB->record_exists_select('role_assignments', "userid = :userid AND roleid $insql", $params);
+        if (is_siteadmin($userid)) {
+            return 'administrador del sitio';
         }
-        return self::$memo['exento'][$clave] = $exento;
+        if (has_capability('local/reglasdeuda:exento', \context_system::instance(), $userid)) {
+            return 'tiene el permiso local/reglasdeuda:exento';
+        }
+        if (!$libres) {
+            return '';
+        }
+        [$insql, $params] = $DB->get_in_or_equal(array_keys($libres), SQL_PARAMS_NAMED);
+        $params['userid'] = $userid;
+        $asignacion = $DB->get_records_select('role_assignments', "userid = :userid AND roleid $insql", $params,
+            'id', 'id, roleid, contextid', 0, 1);
+        if (!$asignacion) {
+            return '';
+        }
+        $asignacion = reset($asignacion);
+        $donde = '';
+        try {
+            $donde = \context::instance_by_id((int)$asignacion->contextid)->get_context_name(true, false);
+        } catch (\Throwable $e) {
+            $donde = 'contexto ' . (int)$asignacion->contextid;
+        }
+        return 'tiene el rol ' . role_get_name($libres[(int)$asignacion->roleid]) . ' en ' . $donde;
     }
 
     /**

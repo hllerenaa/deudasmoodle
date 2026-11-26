@@ -167,7 +167,8 @@ if ($usuario) {
 
     echo html_writer::tag('h4', get_string('resultadoprueba', $c, fullname($usuario)), ['class' => 'mt-4']);
     if (evaluador::esta_exento($regla, (int)$usuario->id)) {
-        echo $OUTPUT->notification(get_string('probar_exento', $c), 'warning');
+        echo $OUTPUT->notification(get_string('probar_exento', $c) . ' Motivo: ' .
+            s(evaluador::motivo_exencion((int)$usuario->id)) . '.', 'warning');
     }
 
     // La peticion ya viene descrita (metodo, URL, cabeceras con el token oculto y cuerpo).

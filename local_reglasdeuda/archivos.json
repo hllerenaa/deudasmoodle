@@ -7,7 +7,7 @@
  "classes/local/aplicador.php": "3332cdda103678af7faeb3ac6d6b786a12688975",
  "classes/local/archivos.php": "d7a731a2aa7a18ec581f1fa11c5aa3458b7c0b28",
  "classes/local/cliente_api.php": "8eafe58d736adcc2541ec2a825601fde4139fc8f",
- "classes/local/evaluador.php": "e438296662c4ba0e386886c297cb196af664baed",
+ "classes/local/evaluador.php": "65c4cc65788b5ce86deec142e142a29d85e4364c",
  "classes/local/mensaje.php": "b91e9b5f118f0e59144a612ab45401631b04c8cc",
  "classes/local/parametros.php": "bc8adc73a7ad7c9a10a1009f000afe1a8bafd3de",
  "classes/local/pestanas.php": "be499f487042a1b0eb931e9e5acd72b41cf07212",
@@ -24,15 +24,15 @@
  "db/install.php": "e73ee21d9dfe31257978becb5c81ea5f5591231f",
  "db/install.xml": "e8d8222d1b9e179a5576d2ee39ea2f2f6d4764a8",
  "db/upgrade.php": "895c4833a0b8c1c30f1c7a910bbc61784e4c59ba",
- "diagnostico.php": "39d02d84c1e4bfc27cdea7a501d39fcd1eb32525",
+ "diagnostico.php": "9c769ddcba54c676dd74102fabd5cd4964626bc7",
  "editar.php": "f6da22cc2993f300bda3af135dbbecdc114b86a6",
  "index.php": "d527a282025955cdfc43a49f38a12e3fe0410add",
  "lang/en/local_reglasdeuda.php": "4156a6d66d361e92d894babf00b8b775c35c27a7",
  "lang/es/local_reglasdeuda.php": "b880ae2a9ac4074590036d53265b68da796f8411",
  "lib.php": "772ddd2bcbb3e080bb34fb4dbf81d12b1556a3c1",
- "probar.php": "a7d18b6674f0b68db3acee507fb7c087a902e83b",
+ "probar.php": "6ea5c696569de499fcf77014fdec1154c36497cb",
  "settings.php": "c117a4517abdd94cb80d241b63ce377f033d9f70",
  "tests/plantilla_test.php": "c64a011c063570e8d698c6d178c56d16f99718b1",
  "verificar.php": "95a10d5a5c80e33dbb1d3457e268f02a34d68ade",
- "version.php": "1fe60b087e643ba1edf426162eea265113e484a4"
+ "version.php": "ebfba9e0db94ba6132cfc4f6e51cbf9f2e5f4e54"
 }

@@ -103,19 +103,35 @@ try {
 $avisos = reglas::activas_por_accion(reglas::ACCION_AVISAR);
 $paso('Reglas activas "Solo mostrar mensaje"', (bool)$avisos, count($avisos) . ' regla(s)');
 
+$bloqueos = reglas::activas_por_accion(reglas::ACCION_BLOQUEAR);
+$paso('Reglas activas "Bloquear acceso a la plataforma"', true, count($bloqueos) . ' regla(s)');
+
 $mensajes = '';
-foreach ($avisos as $regla) {
+foreach (array_merge($avisos, $bloqueos) as $regla) {
     $nombre = format_string($regla->nombre);
+    $esbloqueo = $regla->accion === reglas::ACCION_BLOQUEAR;
     $exento = evaluador::esta_exento($regla, (int)$USER->id);
-    $paso("[$nombre] Se aplica a su usuario", !$exento, $exento ? 'exento' : 'no exento');
+    if ($esbloqueo) {
+        // Administradores y docentes nunca se bloquean: se dice exactamente por que.
+        $paso("[$nombre] Bloqueo de plataforma para su usuario", !$exento, $exento
+            ? 'NO se le bloquea: ' . s(evaluador::motivo_exencion((int)$USER->id)) .
+              '. Pruebe con una cuenta que solo sea estudiante.'
+            : 'se le aplica (no es administrador ni docente)');
+    } else {
+        $paso("[$nombre] Se aplica a su usuario", !$exento, $exento ? 'exento' : 'no exento');
+    }
     try {
         $ev = evaluador::evaluar($regla, $USER, [], true);
         $paso("[$nombre] Consulta a la API (con cache, como en las paginas)", $ev['error'] === '',
             'HTTP ' . $ev['http'] . ($ev['cache'] ? ' (respuesta en cache)' : '') . ($ev['error'] !== '' ? ' — ' . s($ev['error']) : ''));
         $paso("[$nombre] La regla se activa para usted", $ev['aplica'],
             'resultado=' . var_export($ev['resultado'], true) . ', actua con ' . ($regla->valoractiva ? 'true' : 'false'));
+        if ($esbloqueo && $ev['aplica'] && !$exento) {
+            $paso("[$nombre] Resultado", false, 'al ingresar (o al abrir cualquier pagina) se le cerraria la sesion ' .
+                'con el mensaje de deuda');
+        }
         if ($ev['aplica'] && !$exento) {
-            $c = mensaje::contexto($regla, $ev, $USER, []);
+            $c = mensaje::contexto($regla, $ev, $USER, [], !$esbloqueo);
             $mensajes .= mensaje::html($c);
         }
     } catch (\Throwable $e) {
