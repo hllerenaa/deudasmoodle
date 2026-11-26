@@ -27,12 +27,12 @@
  "diagnostico.php": "39d02d84c1e4bfc27cdea7a501d39fcd1eb32525",
  "editar.php": "f6da22cc2993f300bda3af135dbbecdc114b86a6",
  "index.php": "d527a282025955cdfc43a49f38a12e3fe0410add",
- "lang/en/local_reglasdeuda.php": "b4ae1f2584fc4e8f412da2aa09a13d7cf4bba03a",
- "lang/es/local_reglasdeuda.php": "f5ef60723fdfce54b174d2ef2d2c8ec45d2e1cc8",
+ "lang/en/local_reglasdeuda.php": "b7395abb05ca582481a92ca2ecf05f49f5d71f51",
+ "lang/es/local_reglasdeuda.php": "b1f6ecd376359cb48b743ad27d19f36f2499fa67",
  "lib.php": "0a7ef68326582ca0e405d6e3238c82f56090e673",
  "probar.php": "a7d18b6674f0b68db3acee507fb7c087a902e83b",
  "settings.php": "c117a4517abdd94cb80d241b63ce377f033d9f70",
  "tests/plantilla_test.php": "c64a011c063570e8d698c6d178c56d16f99718b1",
  "verificar.php": "95a10d5a5c80e33dbb1d3457e268f02a34d68ade",
- "version.php": "39b469471e933433266e8575357691a90543a616"
+ "version.php": "b05356e5f716298f07004f339bf0da08b5289330"
 }
