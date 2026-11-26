@@ -93,9 +93,8 @@ class aplicador {
         }
 
         if ($cm && $curso && self::primera_vez('cm' . $cm->id)) {
-            $ignora = has_capability('moodle/course:ignoreavailabilityrestrictions', \context_course::instance($curso->id));
             foreach (reglas::activas_por_accion(reglas::ACCION_RESTRINGIR) as $regla) {
-                if (!$ignora && self::cubre_actividad($regla, $cm, $curso) && self::aplica($regla, $contexto)) {
+                if (self::cubre_actividad($regla, $cm, $curso) && self::aplica($regla, $contexto)) {
                     self::cortar($sinredireccion, new \moodle_url('/local/reglasdeuda/bloqueado.php',
                         ['regla' => $regla->id, 'cmid' => $cm->id]));
                 }

@@ -23,6 +23,7 @@
 
 use local_reglasdeuda\local\evaluador;
 use local_reglasdeuda\local\mensaje;
+use local_reglasdeuda\local\parametros;
 use local_reglasdeuda\local\pestanas;
 use local_reglasdeuda\local\reglas;
 
@@ -51,34 +52,62 @@ if (optional_param('usarejemplo', 0, PARAM_BOOL) && confirm_sesskey()) {
     }
 }
 
-// Formulario simple (sin moodleform): usuario a probar.
+// Formulario simple (sin moodleform): buscar personas y elegir con quien probar.
 $textousuario = trim(optional_param('usuario', '', PARAM_RAW_TRIMMED));
+$userid = optional_param('userid', 0, PARAM_INT);
 $usuario = null;
+$encontrados = [];
 $errorusuario = '';
-if ($textousuario !== '' && confirm_sesskey()) {
-    $usuario = local_reglasdeuda_buscar_usuario($textousuario);
-    if (!$usuario) {
+if ($userid && confirm_sesskey()) {
+    $usuario = core_user::get_user($userid);
+    if (!$usuario || !empty($usuario->deleted)) {
+        $usuario = null;
+        $errorusuario = get_string('probar_nousuario', $c);
+    }
+} else if ($textousuario !== '' && confirm_sesskey()) {
+    $encontrados = local_reglasdeuda_buscar_usuarios($textousuario);
+    if (!$encontrados) {
         $errorusuario = get_string('probar_nousuario', $c);
     }
 }
 
 /**
- * Busca un usuario por nombre de usuario, correo o numero de ID (el primero que coincida).
+ * Personas que coinciden con el texto en nombre, apellido, nombre completo, usuario, correo o numero de ID.
  *
  * @param string $texto
- * @return stdClass|null
+ * @return stdClass[] hasta 25
  */
-function local_reglasdeuda_buscar_usuario(string $texto): ?stdClass {
-    global $DB;
-    $usuario = core_user::get_user_by_username(core_text::strtolower($texto));
-    if (!$usuario) {
-        $usuario = core_user::get_user_by_email($texto);
+function local_reglasdeuda_buscar_usuarios(string $texto): array {
+    global $DB, $CFG;
+    $condiciones = [];
+    $params = ['deleted' => 0, 'mnethostid' => $CFG->mnet_localhost_id];
+    $nombrecompleto = $DB->sql_concat('firstname', "' '", 'lastname');
+    foreach (['firstname', 'lastname', 'username', 'email', 'idnumber', $nombrecompleto] as $i => $campo) {
+        $condiciones[] = $DB->sql_like($campo, ":b$i", false, false);
+        $params["b$i"] = '%' . $DB->sql_like_escape($texto) . '%';
     }
-    if (!$usuario) {
-        $encontrados = $DB->get_records('user', ['idnumber' => $texto, 'deleted' => 0], 'id ASC', '*', 0, 1);
-        $usuario = $encontrados ? reset($encontrados) : false;
-    }
-    return ($usuario && empty($usuario->deleted)) ? $usuario : null;
+    $sql = "SELECT * FROM {user}
+             WHERE deleted = :deleted AND mnethostid = :mnethostid AND (" . implode(' OR ', $condiciones) . ")
+          ORDER BY lastname, firstname";
+    return $DB->get_records_sql($sql, $params, 0, 25);
+}
+
+/**
+ * Boton "Probar" para un usuario de la lista.
+ *
+ * @param moodle_url $url
+ * @param int $userid
+ * @param string $texto busqueda actual (para conservarla)
+ * @return string
+ */
+function local_reglasdeuda_boton_probar(moodle_url $url, int $userid, string $texto): string {
+    return html_writer::start_tag('form', ['method' => 'post', 'action' => $url->out(false), 'class' => 'd-inline']) .
+        html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]) .
+        html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'userid', 'value' => $userid]) .
+        html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'usuario', 'value' => $texto]) .
+        html_writer::empty_tag('input', ['type' => 'submit', 'class' => 'btn btn-sm btn-primary',
+            'value' => get_string('probar', 'local_reglasdeuda')]) .
+        html_writer::end_tag('form');
 }
 
 echo $OUTPUT->header();
@@ -95,10 +124,30 @@ echo html_writer::empty_tag('input', ['type' => 'text', 'name' => 'usuario', 'id
     'class' => 'form-control me-2 mr-2', 'value' => $textousuario,
     'placeholder' => get_string('probar_usuario_ph', $c)]);
 echo html_writer::empty_tag('input', ['type' => 'submit', 'class' => 'btn btn-primary',
-    'value' => get_string('probar', $c)]);
+    'value' => get_string('buscar', $c)]);
 echo html_writer::end_tag('form');
 if ($errorusuario !== '') {
     echo $OUTPUT->notification($errorusuario, 'error');
+}
+
+// Lista de personas encontradas, con los datos que se enviarian a la API.
+if ($encontrados) {
+    $tabla = new html_table();
+    $tabla->head = [get_string('fullname'), get_string('username'), get_string('idnumber'), get_string('email'),
+        get_string('datosenviados', $c), ''];
+    $tabla->attributes['class'] = 'generaltable table-sm';
+    foreach ($encontrados as $u) {
+        $enviados = [];
+        foreach (parametros::valores($regla, $u) as $nombre => $valor) {
+            $enviados[] = html_writer::tag('code', s($nombre)) . ' = ' . s($valor);
+        }
+        $tabla->data[] = [fullname($u), s($u->username), s($u->idnumber), s($u->email),
+            implode('<br>', $enviados), local_reglasdeuda_boton_probar($url, (int)$u->id, $textousuario)];
+    }
+    echo html_writer::table($tabla);
+    if (count($encontrados) >= 25) {
+        echo html_writer::div(get_string('masresultados', $c), 'small text-muted mb-3');
+    }
 }
 
 if ($usuario) {

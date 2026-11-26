@@ -171,9 +171,7 @@ class local_reglasdeuda_editor_regla extends \moodleform {
         $f->addHelpButton('globalcursos', 'globalcursos', $c);
         $f->hideIf('globalcursos', 'accion', 'neq', reglas::ACCION_RESTRINGIR);
         $f->hideIf('globalcursos', 'globalactivo', 'notchecked');
-        $f->addElement('autocomplete', 'rolesaplica', get_string('rolesaplica', $c), self::roles(),
-            ['multiple' => true, 'noselectionstring' => get_string('todos', $c)]);
-        $f->addHelpButton('rolesaplica', 'rolesaplica', $c);
+        $f->addElement('static', 'quienes', get_string('quienes', $c), get_string('quienes_desc', $c));
 
         // Mensaje.
         $f->addElement('header', 'h_mensaje', get_string('paso_mensaje', $c));
@@ -366,7 +364,6 @@ $datos = clone $regla;
 $datos->globalmodulos = reglas::csv($regla->globalmodulos);
 $datos->globalcategorias = reglas::csv($regla->globalcategorias);
 $datos->globalcursos = reglas::csv($regla->globalcursos);
-$datos->rolesaplica = reglas::csv($regla->rolesaplica);
 $datos->mensaje_editor = ['text' => (string)$regla->mensaje, 'format' => (int)$regla->mensajeformat];
 $datos->clave = (string)$regla->token;
 unset($datos->token);
@@ -398,7 +395,6 @@ if ($enviado = $form->get_data()) {
     $guardar->globalcategorias = implode(',', array_map('intval', $enviado->globalcategorias ?? []));
     $guardar->globalcursos = implode(',', array_map('intval', (array)($enviado->globalcursos ?? [])));
     $guardar->actividades = implode(',', array_unique(array_map('intval', reglas::csv($enviado->actividades ?? ''))));
-    $guardar->rolesaplica = implode(',', array_map('intval', $enviado->rolesaplica ?? []));
     $guardar->mensaje = $enviado->mensaje_editor['text'];
     $guardar->mensajeformat = (int)$enviado->mensaje_editor['format'];
     if ($guardar->accion !== reglas::ACCION_RESTRINGIR) {

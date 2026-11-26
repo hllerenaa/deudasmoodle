@@ -30,9 +30,15 @@ class evaluador {
     /** @var array memo por peticion: evaluaciones y exenciones (la pagina del curso pregunta muchas veces). */
     private static $memo = ['ev' => [], 'exento' => []];
 
+    /** Arquetipos que siempre pueden entrar aunque la regla sea "bloquear plataforma". */
+    const ARQUETIPOS_LIBRES = ['manager', 'coursecreator', 'editingteacher', 'teacher'];
+
     /**
-     * El usuario no queda afectado por la regla: es admin, tiene la capacidad de exento o no tiene
-     * ninguno de los roles a los que aplica la regla (vacio = aplica a todos).
+     * El usuario no queda afectado por la regla.
+     *
+     * - Avisos y bloqueo de recursos: se aplican a todos (sin importar el rol) si la API dice que debe.
+     * - Bloqueo de plataforma: nunca a administradores, gestores, docentes ni a quien tenga la capacidad
+     *   local/reglasdeuda:exento; asi siempre pueden ingresar aunque tengan deuda.
      *
      * @param \stdClass $regla
      * @param int $userid
@@ -40,24 +46,30 @@ class evaluador {
      */
     public static function esta_exento(\stdClass $regla, int $userid): bool {
         global $DB, $USER;
+        if ($regla->accion !== reglas::ACCION_BLOQUEAR) {
+            return false;
+        }
         $clave = $regla->id . '_' . $userid;
         if (isset(self::$memo['exento'][$clave])) {
             return self::$memo['exento'][$clave];
         }
-        // "Cambiar rol a..." (p.ej. un administrador probando como Estudiante): se evalua con el rol
-        // elegido y no con los permisos reales, para poder probar las reglas con la propia cuenta.
+        $libres = [];
+        foreach (self::ARQUETIPOS_LIBRES as $arquetipo) {
+            foreach (get_archetype_roles($arquetipo) as $rol) {
+                $libres[] = (int)$rol->id;
+            }
+        }
+        // "Cambiar rol a..." (p.ej. un admin probando como Estudiante): cuenta el rol elegido.
         if ($userid == $USER->id && !empty($USER->access['rsw'])) {
-            $roles = array_map('intval', reglas::csv($regla->rolesaplica));
             $cambiados = array_map('intval', array_values($USER->access['rsw']));
-            return self::$memo['exento'][$clave] = ($roles && !array_intersect($roles, $cambiados));
+            return self::$memo['exento'][$clave] = (bool)array_intersect($libres, $cambiados);
         }
         $exento = is_siteadmin($userid)
             || has_capability('local/reglasdeuda:exento', \context_system::instance(), $userid);
-        $roles = array_map('intval', reglas::csv($regla->rolesaplica));
-        if (!$exento && $roles) {
-            [$insql, $params] = $DB->get_in_or_equal($roles, SQL_PARAMS_NAMED);
+        if (!$exento && $libres) {
+            [$insql, $params] = $DB->get_in_or_equal(array_unique($libres), SQL_PARAMS_NAMED);
             $params['userid'] = $userid;
-            $exento = !$DB->record_exists_select('role_assignments', "userid = :userid AND roleid $insql", $params);
+            $exento = $DB->record_exists_select('role_assignments', "userid = :userid AND roleid $insql", $params);
         }
         return self::$memo['exento'][$clave] = $exento;
     }
