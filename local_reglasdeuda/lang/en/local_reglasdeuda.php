@@ -210,3 +210,4 @@ $string['paso_mensaje'] = '4. What message does the student see?';
 $string['respuesta_esperada'] = 'The API should respond like this';
 $string['rutadatos_help'] = 'Response field with values for the message (total, payment link...). Default: datos. Used as {datos.total}.';
 $string['rutamensaje_help'] = 'If the API sends text in this field, it is shown instead of the configured message. Default: mensaje.';
+$string['param_quitar'] = 'Remove';

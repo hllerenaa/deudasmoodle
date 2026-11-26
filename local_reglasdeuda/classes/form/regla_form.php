@@ -79,8 +79,9 @@ class regla_form extends \moodleform {
                 ['' => get_string('choosedots')] + parametros::campos_disponibles()),
             $f->createElement('text', 'param_valor', get_string('param_valor', $c),
                 ['size' => 16, 'placeholder' => get_string('param_valor_ph', $c)]),
+            $f->createElement('advcheckbox', 'param_quitar', '', get_string('param_quitar', $c)),
         ];
-        $grupo = $f->createElement('group', 'param_grupo', get_string('parametro', $c), $fila, ' ← ', false);
+        $grupo = $f->createElement('group', 'param_grupo', get_string('parametro', $c), $fila, [' ← ', ' ', ' '], false);
         $this->repeat_elements([$grupo], max(1, (int)($this->_customdata['numparametros'] ?? 1)), [
             'param_nombre' => ['type' => PARAM_RAW_TRIMMED],
             'param_valor' => ['type' => PARAM_RAW_TRIMMED],
@@ -271,7 +272,7 @@ class regla_form extends \moodleform {
         $filas = [];
         foreach ((array)($data['param_nombre'] ?? []) as $i => $nombre) {
             $nombre = trim((string)$nombre);
-            if ($nombre === '') {
+            if ($nombre === '' || !empty($data['param_quitar'][$i])) {
                 continue;
             }
             $campo = (string)($data['param_campo'][$i] ?? '');
