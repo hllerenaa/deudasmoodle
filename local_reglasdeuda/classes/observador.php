@@ -32,6 +32,15 @@ class observador {
     }
 
     /**
+     * Inicio de sesion con cualquier autenticacion.
+     *
+     * @param \core\event\user_loggedin $evento
+     */
+    public static function usuario_ingreso(\core\event\user_loggedin $evento): void {
+        local\aplicador::al_ingresar();
+    }
+
+    /**
      * @param \core\event\course_module_deleted $evento
      */
     public static function actividad_borrada(\core\event\course_module_deleted $evento): void {

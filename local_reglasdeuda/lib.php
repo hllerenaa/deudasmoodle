@@ -39,7 +39,11 @@ function local_reglasdeuda_pluginfile($course, $cm, $context, $filearea, $args, 
     if ($context->contextlevel != CONTEXT_SYSTEM || $filearea !== 'imagen') {
         return false;
     }
-    require_login(null, false);
+    global $SESSION;
+    // Tras cerrar la sesion por bloqueo de plataforma, la pagina de aviso aun muestra la imagen.
+    if (empty($SESSION->local_reglasdeuda_sesioncerrada)) {
+        require_login(null, false);
+    }
     $itemid = (int)array_shift($args);
     $nombre = array_pop($args);
     $ruta = $args ? '/' . implode('/', $args) . '/' : '/';

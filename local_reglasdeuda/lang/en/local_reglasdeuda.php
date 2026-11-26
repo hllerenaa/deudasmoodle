@@ -252,3 +252,6 @@ $string['accion_no_disponible'] = 'Not available: you have pending payments';
 $string['actividadbloqueada'] = 'Activity blocked due to pending payments';
 $string['actividadbloqueada_desc'] = 'You cannot open "{$a}" because you have pending payments. Once you pay you will be able to enter normally.';
 $string['cursobloqueado_desc'] = 'You cannot enter this part of the course "{$a}" because you have pending payments.';
+$string['sesioncerrada'] = 'Your session was closed';
+$string['sesioncerrada_desc'] = 'You cannot access the platform because you have pending payments with the institution. That is why your session was closed. Once you pay you will be able to log in again.';
+$string['volveringresar'] = 'Log in again';

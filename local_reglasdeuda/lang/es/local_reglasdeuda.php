@@ -252,3 +252,6 @@ $string['accion_no_disponible'] = 'No disponible: tiene valores pendientes';
 $string['actividadbloqueada'] = 'Actividad bloqueada por valores pendientes';
 $string['actividadbloqueada_desc'] = 'No puede abrir "{$a}" porque tiene valores pendientes. Cuando regularice su pago podra entrar con normalidad.';
 $string['cursobloqueado_desc'] = 'No puede entrar a esta parte del curso "{$a}" porque tiene valores pendientes.';
+$string['sesioncerrada'] = 'Su sesion fue cerrada';
+$string['sesioncerrada_desc'] = 'No puede ingresar a la plataforma porque tiene valores pendientes con la institucion. Por eso se cerro su sesion. Cuando regularice su pago podra ingresar nuevamente.';
+$string['volveringresar'] = 'Volver a iniciar sesion';

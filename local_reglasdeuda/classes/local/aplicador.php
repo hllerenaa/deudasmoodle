@@ -55,6 +55,32 @@ class aplicador {
     public static $forzar = false;
 
     /**
+     * Al iniciar sesion, con cualquier tipo de autenticacion (manual, correo, Google/Microsoft, LDAP,
+     * CAS, SAML...): si una regla "Bloquear plataforma" aplica, la primera pagina sera la de bloqueo.
+     * Administradores y docentes quedan exentos (evaluador::esta_exento). Nunca rompe el ingreso.
+     */
+    public static function al_ingresar(): void {
+        global $SESSION, $CFG;
+        try {
+            if (CLI_SCRIPT || !empty($CFG->upgraderunning) || !get_config('local_reglasdeuda', 'habilitado')) {
+                return;
+            }
+            if (!isloggedin() || isguestuser() || \core\session\manager::is_loggedinas()) {
+                return;
+            }
+            foreach (reglas::activas_por_accion(reglas::ACCION_BLOQUEAR) as $regla) {
+                if (self::aplica($regla, ['curso' => null, 'cmid' => null])) {
+                    $SESSION->wantsurl = (new \moodle_url('/local/reglasdeuda/bloqueado.php',
+                        ['regla' => $regla->id]))->out(false);
+                    return;
+                }
+            }
+        } catch (\Throwable $e) {
+            debugging('local_reglasdeuda: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        }
+    }
+
+    /**
      * Olvida lo ya procesado en esta peticion (Diagnostico genera el aviso dos veces).
      */
     public static function reiniciar(): void {
@@ -174,6 +200,17 @@ class aplicador {
         }
         if (!isloggedin() || isguestuser() || !get_config('local_reglasdeuda', 'habilitado')) {
             return '';
+        }
+        // Respaldo del bloqueo de plataforma para paginas que no llaman a require_login (p. ej. la portada
+        // tras un ingreso con Google/Microsoft/SAML/CAS): se lleva al usuario a la pagina de bloqueo.
+        if (!self::$forzar && !self::script_libre((string)$SCRIPT) && self::primera_vez('bloquear')) {
+            foreach (reglas::activas_por_accion(reglas::ACCION_BLOQUEAR) as $regla) {
+                if (self::aplica($regla, ['curso' => null, 'cmid' => null])) {
+                    $url = new \moodle_url('/local/reglasdeuda/bloqueado.php', ['regla' => $regla->id]);
+                    return \html_writer::tag('style', 'body>*{visibility:hidden}') .
+                        \html_writer::script('window.location.replace(' . json_encode($url->out(false)) . ');');
+                }
+            }
         }
         $avisos = self::$pendientes;
         self::$pendientes = [];

@@ -100,7 +100,7 @@ mensaje pueden quedar vacíos si no se usan.
 | Acción | Qué ve el usuario con deuda |
 |---|---|
 | **Solo mostrar mensaje** | Aviso en Página principal, Área personal, Mis cursos y al entrar a cada curso |
-| **Bloquear acceso a la plataforma** | Página con el mensaje y *Cerrar sesión*. **No aplica a administradores, gestores ni docentes** |
+| **Bloquear acceso a la plataforma** | Al iniciar sesión (con cualquier autenticación: manual, correo, Google/Microsoft, LDAP, CAS, SAML) se le **cierra la sesión** y ve la página "Su sesión fue cerrada" con la explicación, el mensaje de la deuda y *Volver a iniciar sesión*. **No aplica a administradores, gestores ni docentes** |
 | **Ninguna** | Nada general; solo se usa el bloqueo de recursos |
 
 Avisos y bloqueo de recursos se aplican a **todos** los usuarios con deuda, sin importar el rol.
@@ -191,7 +191,7 @@ Estudiante abre una página
         ▼
  ¿resultado == valor que activa la regla?
         │ sí
-        ├── Bloquear plataforma → página de bloqueo con el mensaje
+        ├── Bloquear plataforma → cierra la sesión y muestra por qué (deuda) con el mensaje
         ├── Bloquear recursos   → al abrir la actividad: mensaje + Volver al curso
         └── Solo mensaje        → aviso en Área personal, Mis cursos y cursos
 ```

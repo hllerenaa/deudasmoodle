@@ -87,9 +87,24 @@ if ($cmid) {
     $PAGE->set_title($titulo . ' | ' . format_string($curso->fullname));
     $PAGE->set_heading(format_string($curso->fullname));
 } else {
+    // Bloqueo de plataforma: se arma el mensaje, se cierra la sesion y se explica por que.
+    $mensajeplataforma = mensaje::html(mensaje::contexto($regla, $evaluacion, $USER, $contexto, false));
+    evaluador::olvidar_usuario((int)$USER->id); // Al volver a ingresar se consulta de nuevo la API.
+    require_logout();
+    $SESSION->local_reglasdeuda_sesioncerrada = true;
+    $PAGE->set_context(context_system::instance());
     $PAGE->set_pagelayout('login');
+    $titulo = get_string('sesioncerrada', 'local_reglasdeuda');
     $PAGE->set_title($titulo);
     $PAGE->set_heading($SITE->fullname);
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading('🔒 ' . $titulo, 2);
+    echo html_writer::tag('p', get_string('sesioncerrada_desc', 'local_reglasdeuda'), ['class' => 'lead']);
+    echo $mensajeplataforma;
+    echo html_writer::div(html_writer::link(new moodle_url('/login/index.php'),
+        get_string('volveringresar', 'local_reglasdeuda'), ['class' => 'btn btn-outline-secondary']), 'mt-3');
+    echo $OUTPUT->footer();
+    exit;
 }
 
 echo $OUTPUT->header();
@@ -107,12 +122,7 @@ if ($explicacion !== '') {
 }
 echo mensaje::html(mensaje::contexto($regla, $evaluacion, $USER, $contexto));
 
-if ($encurso) {
-    echo html_writer::div(html_writer::link($volver, get_string('volvercurso', 'local_reglasdeuda'),
-        ['class' => 'btn btn-outline-secondary']), 'mt-3');
-} else {
-    $salir = new moodle_url('/login/logout.php', ['sesskey' => sesskey()]);
-    echo html_writer::div(html_writer::link($salir, get_string('logout'), ['class' => 'btn btn-outline-secondary']), 'mt-3');
-}
+echo html_writer::div(html_writer::link($volver, get_string('volvercurso', 'local_reglasdeuda'),
+    ['class' => 'btn btn-outline-secondary']), 'mt-3');
 
 echo $OUTPUT->footer();

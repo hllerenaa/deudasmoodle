@@ -29,6 +29,11 @@ $observers = [
         'eventname' => '\core\event\user_deleted',
         'callback' => '\local_reglasdeuda\observador::usuario_borrado',
     ],
+    // Cualquier tipo de autenticacion (manual, correo, OAuth2, LDAP, CAS, SAML...) dispara este evento.
+    [
+        'eventname' => '\core\event\user_loggedin',
+        'callback' => '\local_reglasdeuda\observador::usuario_ingreso',
+    ],
     [
         'eventname' => '\core\event\course_module_deleted',
         'callback' => '\local_reglasdeuda\observador::actividad_borrada',
