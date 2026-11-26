@@ -38,6 +38,7 @@
         <FIELD NAME="botonurl" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="botonurlrespaldo" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="nuevapestana" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="modal" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1: ademas, ventana emergente una vez por sesion"/>
         <FIELD NAME="estilo" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="warning" SEQUENCE="false" COMMENT="info, warning o danger"/>
         <FIELD NAME="respuestaejemplo" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON de ejemplo para descubrir variables"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -56,6 +57,7 @@
         <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="reglaid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="modo" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="entregar" SEQUENCE="false" COMMENT="entrar o entregar"/>
+        <FIELD NAME="excepciones" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="CSV de userid que ven el mensaje pero pueden realizarla"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

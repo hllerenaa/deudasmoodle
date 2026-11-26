@@ -30,6 +30,7 @@ use local_reglasdeuda\local\reglas;
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->libdir . '/filelib.php');
 // El formulario va dentro de esta pagina y no en un archivo aparte: el antivirus del hosting
 // borraba los archivos de formularios sueltos (classes/form/, classes/formularios/).
 
@@ -43,6 +44,15 @@ class local_reglasdeuda_editor_regla extends \moodleform {
 
     /**
      * Opciones del editor del mensaje (sin archivos: el mensaje se muestra fuera de cualquier area de archivos).
+     *
+     * @return array
+     */
+    public static function opciones_imagen(): array {
+        return ['maxfiles' => 1, 'subdirs' => 0, 'accepted_types' => ['web_image'], 'maxbytes' => 2 * 1024 * 1024];
+    }
+
+    /**
+     * Opciones del editor del mensaje.
      *
      * @return array
      */
@@ -194,6 +204,10 @@ class local_reglasdeuda_editor_regla extends \moodleform {
         $f->addElement('text', 'botonurlrespaldo', get_string('botonurlrespaldo', $c), ['size' => 60]);
         $f->setType('botonurlrespaldo', PARAM_RAW_TRIMMED);
         $f->addElement('advcheckbox', 'nuevapestana', get_string('nuevapestana', $c));
+        $f->addElement('filemanager', 'imagen_archivos', get_string('imagen', $c), null, self::opciones_imagen());
+        $f->addHelpButton('imagen_archivos', 'imagen', $c);
+        $f->addElement('advcheckbox', 'modal', get_string('modal', $c), get_string('modal_desc', $c));
+        $f->addHelpButton('modal', 'modal', $c);
         $f->addElement('select', 'estilo', get_string('estilo', $c), [
             'info' => get_string('estilo_info', $c),
             'warning' => get_string('estilo_warning', $c),
@@ -365,6 +379,10 @@ $datos->globalmodulos = reglas::csv($regla->globalmodulos);
 $datos->globalcategorias = reglas::csv($regla->globalcategorias);
 $datos->globalcursos = reglas::csv($regla->globalcursos);
 $datos->mensaje_editor = ['text' => (string)$regla->mensaje, 'format' => (int)$regla->mensajeformat];
+$borradorimagen = file_get_submitted_draft_itemid('imagen_archivos');
+file_prepare_draft_area($borradorimagen, context_system::instance()->id, 'local_reglasdeuda', 'imagen', $id ?: null,
+    local_reglasdeuda_editor_regla::opciones_imagen());
+$datos->imagen_archivos = $borradorimagen;
 $datos->clave = (string)$regla->token;
 unset($datos->token);
 $lista = parametros::de_regla($regla);
@@ -402,6 +420,8 @@ if ($enviado = $form->get_data()) {
         $guardar->actividades = '';
     }
     $nuevoid = reglas::guardar($guardar);
+    file_save_draft_area_files($enviado->imagen_archivos, context_system::instance()->id, 'local_reglasdeuda', 'imagen',
+        $nuevoid, local_reglasdeuda_editor_regla::opciones_imagen());
     redirect(new moodle_url('/local/reglasdeuda/probar.php', ['id' => $nuevoid]),
         get_string('reglaguardada', 'local_reglasdeuda'), null, \core\output\notification::NOTIFY_SUCCESS);
 }

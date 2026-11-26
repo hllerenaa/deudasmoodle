@@ -50,7 +50,7 @@ $paso('Aplicar reglas (pestana Ajustes)', (bool)get_config('local_reglasdeuda', 
 $hookok = false;
 $hookdetalle = '';
 if (class_exists('\core\hook\manager') && method_exists('\core\hook\manager', 'get_callbacks_for_hook')) {
-    $callbacks = \core\hook\manager::get_instance()->get_callbacks_for_hook('core\hook\output\before_http_headers');
+    $callbacks = \core\hook\manager::get_instance()->get_callbacks_for_hook('core\hook\output\before_standard_top_of_body_html_generation');
     foreach ($callbacks as $cb) {
         $hookdetalle .= s($cb['callback']) . ($cb['disabled'] ?? false ? ' (DESACTIVADO)' : '') . '<br>';
         if (strpos($cb['callback'], 'local_reglasdeuda') !== false && empty($cb['disabled'])) {
@@ -58,11 +58,11 @@ if (class_exists('\core\hook\manager') && method_exists('\core\hook\manager', 'g
         }
     }
 } else {
-    $hookok = function_exists('local_reglasdeuda_before_http_headers');
+    $hookok = function_exists('local_reglasdeuda_before_standard_top_of_body_html');
     $hookdetalle = 'Moodle sin hooks: callback de lib.php';
 }
-$paso('Gancho de avisos registrado (before_http_headers)', $hookok, $hookdetalle);
-$paso('Tema', true, s($CFG->theme) . ' (los avisos se muestran como notificaciones del tema)');
+$paso('Gancho de avisos registrado (inicio del body)', $hookok, $hookdetalle);
+$paso('Tema', true, s($PAGE->theme->name) . ' (el aviso se inserta al inicio del contenido; no depende del tema)');
 
 $avisos = reglas::activas_por_accion(reglas::ACCION_AVISAR);
 $paso('Reglas activas "Solo mostrar mensaje"', (bool)$avisos, count($avisos) . ' regla(s)');
@@ -81,8 +81,6 @@ foreach ($avisos as $regla) {
         if ($ev['aplica'] && !$exento) {
             $c = mensaje::contexto($regla, $ev, $USER, []);
             $mensajes .= mensaje::html($c);
-            // Misma notificacion que en Area personal: si aparece arriba de esta pagina, el tema las muestra.
-            \core\notification::add(mensaje::html($c, false), mensaje::NOTIFICACION[$c['estilo']]);
         }
     } catch (\Throwable $e) {
         $paso("[$nombre] Error interno", false, s(get_class($e) . ': ' . $e->getMessage()));

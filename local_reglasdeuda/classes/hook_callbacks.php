@@ -25,13 +25,13 @@ namespace local_reglasdeuda;
 class hook_callbacks {
 
     /**
-     * Antes de enviar la cabecera de cada pagina: avisos de las reglas "solo mensaje".
+     * Inicio del body de cada pagina: avisos de las reglas (no depende de las notificaciones del tema).
      *
-     * @param \core\hook\output\before_http_headers $hook
+     * @param \core\hook\output\before_standard_top_of_body_html_generation $hook
      */
-    public static function antes_cabeceras($hook): void {
+    public static function inicio_body($hook): void {
         try {
-            local\aplicador::avisos_pagina();
+            $hook->add_html(local\aplicador::html_avisos());
         } catch (\Throwable $e) {
             error_log('local_reglasdeuda: ' . $e->getMessage());
         }

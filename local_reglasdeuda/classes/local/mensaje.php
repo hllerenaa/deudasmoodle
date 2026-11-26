@@ -68,7 +68,33 @@ class mensaje {
             'estilo' => $estilo,
             'alerta' => $estilo === 'danger' ? 'alert-danger' : ($estilo === 'info' ? 'alert-info' : 'alert-warning'),
             'verificarurl' => $converificar ? $verificar->out(false) : '',
+            'imagen' => self::url_imagen((int)$regla->id),
+            'modal' => !empty($regla->modal),
+            'clave' => 'local_reglasdeuda_r' . (int)$regla->id . 't' . (int)$regla->timemodified,
         ];
+    }
+
+    /** @var array memo reglaid => url de la imagen ('' si no tiene) */
+    private static $imagenes = [];
+
+    /**
+     * URL de la imagen de la regla ('' si no tiene).
+     *
+     * @param int $reglaid
+     * @return string
+     */
+    public static function url_imagen(int $reglaid): string {
+        if (!array_key_exists($reglaid, self::$imagenes)) {
+            $url = '';
+            $archivos = get_file_storage()->get_area_files(\context_system::instance()->id, 'local_reglasdeuda',
+                'imagen', $reglaid, 'itemid, filepath, filename', false);
+            if ($archivo = reset($archivos)) {
+                $url = \moodle_url::make_pluginfile_url($archivo->get_contextid(), 'local_reglasdeuda', 'imagen',
+                    $reglaid, $archivo->get_filepath(), $archivo->get_filename())->out(false);
+            }
+            self::$imagenes[$reglaid] = $url;
+        }
+        return self::$imagenes[$reglaid];
     }
 
     /**
@@ -81,6 +107,10 @@ class mensaje {
      */
     public static function html(array $c, bool $conalerta = true): string {
         $partes = '';
+        if (($c['imagen'] ?? '') !== '') {
+            $partes .= \html_writer::div(\html_writer::empty_tag('img', ['src' => $c['imagen'], 'alt' => '',
+                'class' => 'img-fluid', 'style' => 'max-height: 220px;']), 'local-reglasdeuda-imagen mb-2');
+        }
         if ($c['titulo'] !== '') {
             $partes .= \html_writer::tag('h4', $c['titulo'], ['class' => 'local-reglasdeuda-titulo']);
         }
@@ -102,6 +132,48 @@ class mensaje {
         }
         $clase = 'local-reglasdeuda-mensaje' . ($conalerta ? ' alert ' . $c['alerta'] : '');
         return \html_writer::div($partes, $clase, ['role' => 'alert']);
+    }
+
+    /**
+     * Avisos de la pagina: siempre como caja al inicio del contenido principal y, si la regla lo pide,
+     * ademas como ventana emergente (una vez por sesion del navegador). No depende del tema.
+     *
+     * @param array[] $avisos contextos de contexto()
+     * @return string
+     */
+    public static function envolver_avisos(array $avisos): string {
+        $cajas = '';
+        $modales = '';
+        foreach ($avisos as $c) {
+            $cajas .= self::html($c);
+            if (!empty($c['modal'])) {
+                $cerrar = \html_writer::tag('button', get_string('cerrar', 'local_reglasdeuda'),
+                    ['type' => 'button', 'class' => 'btn btn-secondary local-reglasdeuda-cerrar']);
+                $caja = \html_writer::div(self::html($c) . \html_writer::div($cerrar, 'text-end text-right'),
+                    'local-reglasdeuda-modal-caja', ['role' => 'dialog', 'aria-modal' => 'true',
+                    'style' => 'background:#fff;max-width:640px;width:100%;max-height:90vh;overflow:auto;' .
+                        'border-radius:.5rem;padding:1rem;box-shadow:0 .5rem 2rem rgba(0,0,0,.3);']);
+                $modales .= \html_writer::div($caja, 'local-reglasdeuda-modal', ['data-clave' => $c['clave'],
+                    'style' => 'display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:100000;' .
+                        'background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:1rem;']);
+            }
+        }
+        $html = \html_writer::div($cajas, 'local-reglasdeuda-avisos',
+            ['id' => 'local-reglasdeuda-avisos', 'style' => 'margin: 1rem 0; position: relative; z-index: 1;']) . $modales;
+        // Mueve la caja al inicio del contenido principal (Boost, Classic y temas de terceros) y muestra
+        // cada modal una sola vez por sesion del navegador.
+        $js = "(function(){function mover(){var a=document.getElementById('local-reglasdeuda-avisos');if(a){" .
+            "var s=['#region-main-box','#region-main','[role=\"main\"]','#page-content','main','#page'];" .
+            "for(var i=0;i<s.length;i++){var d=document.querySelector(s[i]);" .
+            "if(d&&!d.contains(a)&&!a.contains(d)){d.insertBefore(a,d.firstChild);break;}}}" .
+            "var m=document.querySelectorAll('.local-reglasdeuda-modal');for(var j=0;j<m.length;j++){(function(x){" .
+            "var k=x.getAttribute('data-clave'),visto=false;try{visto=!!window.sessionStorage.getItem(k);}catch(e){}" .
+            "if(visto){x.parentNode.removeChild(x);return;}document.body.appendChild(x);x.style.display='flex';" .
+            "var c=function(){x.parentNode.removeChild(x);try{window.sessionStorage.setItem(k,'1');}catch(e){}};" .
+            "x.querySelector('.local-reglasdeuda-cerrar').addEventListener('click',c);" .
+            "x.addEventListener('click',function(e){if(e.target===x){c();}});})(m[j]);}}" .
+            "if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',mover);}else{mover();}})();";
+        return $html . \html_writer::script($js);
     }
 
     /**

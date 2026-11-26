@@ -96,8 +96,20 @@ class recursos {
             $mform->addElement('hidden', 'reglasdeuda_modo', self::MODO_ENTRAR);
             $mform->setType('reglasdeuda_modo', PARAM_ALPHA);
         }
+        // Excepciones: estudiantes que ven el mensaje pero pueden realizar la actividad.
+        $curso = $formwrapper->get_course();
+        $inscritos = [];
+        foreach (get_enrolled_users(\context_course::instance($curso->id), '', 0, 'u.*', 'u.lastname, u.firstname') as $u) {
+            $inscritos[$u->id] = fullname($u) . ($u->idnumber !== '' ? ' (' . $u->idnumber . ')' : '');
+        }
+        $mform->addElement('autocomplete', 'reglasdeuda_excepciones', get_string('cm_excepciones', $c), $inscritos,
+            ['multiple' => true, 'noselectionstring' => get_string('ninguno', $c)]);
+        $mform->addHelpButton('reglasdeuda_excepciones', 'cm_excepciones', $c);
+        $mform->hideIf('reglasdeuda_excepciones', 'reglasdeuda_regla', 'eq', 0);
+
         $cm = $formwrapper->get_coursemodule();
         $actual = $cm ? self::de_actividad((int)$cm->id) : null;
+        $mform->setDefault('reglasdeuda_excepciones', $actual ? reglas::csv($actual->excepciones ?? '') : []);
         $mform->setDefault('reglasdeuda_regla', $actual ? (int)$actual->reglaid : 0);
         $mform->setDefault('reglasdeuda_modo', $actual ? $actual->modo : self::MODO_ENTREGAR);
     }
@@ -115,6 +127,7 @@ class recursos {
         $cmid = (int)$data->coursemodule;
         $reglaid = (int)$data->reglasdeuda_regla;
         $modo = ($data->reglasdeuda_modo ?? '') === self::MODO_ENTRAR ? self::MODO_ENTRAR : self::MODO_ENTREGAR;
+        $excepciones = implode(',', array_map('intval', (array)($data->reglasdeuda_excepciones ?? [])));
         $actual = $DB->get_record(self::TABLA, ['cmid' => $cmid]);
         if (!$reglaid) {
             if ($actual) {
@@ -123,9 +136,11 @@ class recursos {
         } else if ($actual) {
             $actual->reglaid = $reglaid;
             $actual->modo = $modo;
+            $actual->excepciones = $excepciones;
             $DB->update_record(self::TABLA, $actual);
         } else {
-            $DB->insert_record(self::TABLA, (object)['cmid' => $cmid, 'reglaid' => $reglaid, 'modo' => $modo]);
+            $DB->insert_record(self::TABLA, (object)['cmid' => $cmid, 'reglaid' => $reglaid, 'modo' => $modo,
+                'excepciones' => $excepciones]);
         }
         unset(self::$memo[$cmid]);
     }

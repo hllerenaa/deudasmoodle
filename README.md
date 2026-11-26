@@ -120,6 +120,14 @@ El estudiante con deuda ve la actividad con el mensaje arriba y, al pulsar
 El administrador puede además bloquear por ID, tipo de actividad, categoría o curso.
 
 ### Mensaje
+- **Imagen** opcional (arriba del título) y **Ventana emergente**: además de la caja en
+  la página, el mensaje aparece en una ventana que el estudiante debe cerrar (una vez
+  por sesión del navegador).
+- El aviso se inserta al inicio del contenido principal con el gancho de inicio de
+  página de Moodle, por lo que **no depende del tema** (probado en Boost y Classic).
+- En cada actividad bloqueada, el docente puede elegir estudiantes que **pueden
+  realizarla igual** (ven el mensaje pero pueden entregar o iniciar el intento).
+
 - **Título**, **Mensaje** (editor con formato), **Texto del botón**, **Enlace del
   botón** (p. ej. `{datos.url_pago}`), **Enlace de respaldo** (si la API no manda
   enlace), **Abrir en pestaña nueva** y **Estilo** (información, advertencia, peligro).
@@ -214,7 +222,15 @@ Estudiante abre una página
 | "El usuario no tiene ..." | Al estudiante le falta el campo que se envía (p. ej. número de ID) |
 | Las actividades por ID dejaron de bloquearse tras duplicar/restaurar un curso | Las copias tienen IDs nuevos: agréguelos o use el filtro por curso/categoría |
 
-## 9. Desarrollo
+## 9. Compatibilidad probada
+
+Moodle **4.1.22** (PHP 8.1), **4.5.16** (PHP 8.3) y **5.1.9** (PHP 8.3, carpeta `public/`),
+temas **Boost** y **Classic**: avisos en Página principal, Área personal, Mis cursos y
+curso; ventana emergente e imagen; bloqueo de *Comenzar intento* y *Agregar entrega*;
+excepciones por actividad; todas las pantallas de administración. Entorno de prueba
+con Docker en `../_moodle_local` (no forma parte del plugin).
+
+## 10. Desarrollo
 
 ```
 local_reglasdeuda/

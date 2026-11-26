@@ -77,6 +77,7 @@ class reglas {
             'botonurlrespaldo' => '',
             'nuevapestana' => 1,
             'estilo' => 'warning',
+            'modal' => 0,
             'respuestaejemplo' => '',
         ];
     }
@@ -155,6 +156,7 @@ class reglas {
     public static function borrar(int $id): void {
         global $DB;
         $DB->delete_records(self::TABLA, ['id' => $id]);
+        get_file_storage()->delete_area_files(\context_system::instance()->id, 'local_reglasdeuda', 'imagen', $id);
         self::invalidar_caches();
     }
 

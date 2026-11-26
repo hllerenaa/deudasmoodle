@@ -24,8 +24,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_reglasdeuda';
-$plugin->version   = 2026112612;   // YYYYMMDDXX.
+$plugin->version   = 2026112614;   // YYYYMMDDXX.
 $plugin->requires  = 2022112800;   // Moodle 4.1.
 $plugin->supported = [401, 501];
 $plugin->maturity  = MATURITY_BETA;
-$plugin->release   = '0.3.1';
+$plugin->release   = '0.3.3';

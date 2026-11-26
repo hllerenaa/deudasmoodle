@@ -110,5 +110,19 @@ function xmldb_local_reglasdeuda_upgrade($oldversion) {
         \cache::make('local_reglasdeuda', 'reglas')->purge();
         upgrade_plugin_savepoint(true, 2026112612, 'local', 'reglasdeuda');
     }
+    if ($oldversion < 2026112614) {
+        $reglas = new xmldb_table('local_reglasdeuda_reglas');
+        $modal = new xmldb_field('modal', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        if (!$dbman->field_exists($reglas, $modal)) {
+            $dbman->add_field($reglas, $modal);
+        }
+        $cm = new xmldb_table('local_reglasdeuda_cm');
+        $excepciones = new xmldb_field('excepciones', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        if (!$dbman->field_exists($cm, $excepciones)) {
+            $dbman->add_field($cm, $excepciones);
+        }
+        \cache::make('local_reglasdeuda', 'reglas')->purge();
+        upgrade_plugin_savepoint(true, 2026112614, 'local', 'reglasdeuda');
+    }
     return true;
 }

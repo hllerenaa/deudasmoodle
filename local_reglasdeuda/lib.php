@@ -24,6 +24,33 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Sirve la imagen del mensaje (area "imagen" del contexto de sistema) a usuarios identificados.
+ *
+ * @param stdClass $course
+ * @param stdClass|null $cm
+ * @param context $context
+ * @param string $filearea
+ * @param array $args
+ * @param bool $forcedownload
+ * @param array $options
+ * @return bool
+ */
+function local_reglasdeuda_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
+    if ($context->contextlevel != CONTEXT_SYSTEM || $filearea !== 'imagen') {
+        return false;
+    }
+    require_login(null, false);
+    $itemid = (int)array_shift($args);
+    $nombre = array_pop($args);
+    $ruta = $args ? '/' . implode('/', $args) . '/' : '/';
+    $archivo = get_file_storage()->get_file($context->id, 'local_reglasdeuda', 'imagen', $itemid, $ruta, $nombre);
+    if (!$archivo || $archivo->is_directory()) {
+        return false;
+    }
+    send_stored_file($archivo, DAYSECS, 0, $forcedownload, $options);
+}
+
+/**
  * Agrega "Bloqueo por deuda" a la configuracion de cada actividad (si hay reglas con recursos).
  *
  * @param moodleform_mod $formwrapper
@@ -50,14 +77,17 @@ function local_reglasdeuda_coursemodule_edit_post_actions($data, $course) {
 }
 
 /**
- * Avisos de las reglas "solo mensaje" (portada, Area personal, Mis cursos, cursos).
+ * Avisos al inicio del body (Moodle 4.1 a 4.3). En 4.4+ lo reemplaza db/hooks.php
+ * (Moodle ignora este callback si el plugin registra el hook).
+ *
+ * @return string
  */
-function local_reglasdeuda_before_http_headers() {
-    // Moodle 4.1 a 4.3. En 4.4+ lo reemplaza db/hooks.php (Moodle ignora este callback si existe el hook).
+function local_reglasdeuda_before_standard_top_of_body_html() {
     try {
-        \local_reglasdeuda\local\aplicador::avisos_pagina();
+        return \local_reglasdeuda\local\aplicador::html_avisos();
     } catch (\Throwable $e) {
         error_log('local_reglasdeuda: ' . $e->getMessage());
+        return '';
     }
 }
 

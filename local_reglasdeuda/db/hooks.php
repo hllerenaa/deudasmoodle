@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Hooks (Moodle 4.4+). En 4.1-4.3 se usa local_reglasdeuda_before_http_headers() de lib.php.
+ * Hooks (Moodle 4.4+). En 4.1-4.3 se usa local_reglasdeuda_before_standard_top_of_body_html() de lib.php.
  *
  * @package    local_reglasdeuda
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $callbacks = [
     [
-        'hook' => 'core\hook\output\before_http_headers',
-        'callback' => 'local_reglasdeuda\hook_callbacks::antes_cabeceras',
+        'hook' => 'core\hook\output\before_standard_top_of_body_html_generation',
+        'callback' => 'local_reglasdeuda\hook_callbacks::inicio_body',
     ],
 ];
